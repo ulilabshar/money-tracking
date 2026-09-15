@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DompetKu</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#6366f1" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="DompetKu" />
+  <meta name="description" content="Pencatat pemasukan dan pengeluaran pribadi yang modern." />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50:  '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            income:  { DEFAULT: '#10b981', light: '#d1fae5' },
+            expense: { DEFAULT: '#ef4444', light: '#fee2e2' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 9999px; }
+
+    /* Smooth transitions */
+    * { transition-property: color, background-color, border-color, opacity, transform, box-shadow;
+        transition-duration: 150ms; transition-timing-function: ease-in-out; }
+
+    /* Loading skeleton animation */
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position:  200% 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+
+    /* Fade-in for transaction rows */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeInUp 0.3s ease-out forwards; }
+
+    /* Toast notification */
+    #toast { transition: all 0.3s ease; }
+  </style>
+</head>
+
+<body class="bg-slate-100 font-sans min-h-screen antialiased">
+
+  <!-- ===== HEADER / HERO ===== -->
+  <header class="bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg">
+    <div class="max-w-lg mx-auto px-4 pt-10 pb-20">
+      <div class="flex items-center justify-between mb-1">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">💰</span>
+          <h1 class="text-xl font-bold tracking-tight">DompetKu</h1>
+        </div>
+        <!-- Install PWA Button (hidden by default, shown by JS) -->
+        <button id="pwa-install-btn"
+          class="hidden text-xs font-semibold bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/30">
+          📲 Install App
+        </button>
+      </div>
+      <p class="text-primary-100 text-sm">Pencatat keuangan harian Anda</p>
+
+      <!-- Summary Cards -->
+      <div class="mt-6 grid grid-cols-3 gap-3">
+        <!-- Balance -->
+        <div class="col-span-3 bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+          <p class="text-primary-100 text-xs font-medium uppercase tracking-wider">Saldo Saat Ini</p>
+          <p id="balance-amount" class="text-3xl font-extrabold mt-1 tracking-tight">
+            <span class="skeleton h-8 w-36 rounded-lg inline-block"></span>
+          </p>
+        </div>
+        <!-- Income -->
+        <div class="col-span-1 bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/15">
+          <p class="text-income-light text-xs font-medium">⬆ Pemasukan</p>
+          <p id="total-income" class="text-white font-bold text-sm mt-1">
+            <span class="skeleton h-4 w-16 rounded inline-block"></span>
+          </p>
+        </div>
+        <!-- Expense -->
+        <div class="col-span-2 bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/15">
+          <p class="text-expense-light text-xs font-medium">⬇ Pengeluaran</p>
+          <p id="total-expense" class="text-white font-bold text-sm mt-1">
+            <span class="skeleton h-4 w-24 rounded inline-block"></span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN CONTENT (overlaps header) ===== -->
+  <main class="max-w-lg mx-auto px-4 -mt-10 pb-24 space-y-5">
+
+    <!-- ===== ADD TRANSACTION CARD ===== -->
+    <section class="bg-white rounded-2xl shadow-md p-5 border border-slate-100">
+      <h2 class="text-base font-semibold text-slate-700 mb-4 flex items-center gap-2">
+        <span class="bg-primary-50 text-primary-500 w-7 h-7 rounded-lg flex items-center justify-center text-sm">+</span>
+        Tambah Transaksi
+      </h2>
+
+      <form id="transaction-form" class="space-y-4" novalidate>
+        <!-- Type Toggle -->
+        <div class="flex gap-2 p-1 bg-slate-100 rounded-xl">
+          <button type="button" id="btn-income"
+            class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all bg-income text-white shadow-sm">
+            ⬆ Pemasukan
+          </button>
+          <button type="button" id="btn-expense"
+            class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all text-slate-500">
+            ⬇ Pengeluaran
+          </button>
+        </div>
+        <input type="hidden" id="tx-type" value="income" />
+
+        <!-- Amount -->
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-sm">Rp</span>
+          <input type="number" id="tx-amount" placeholder="0" min="1" required
+            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-slate-800 font-semibold text-base
+                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-slate-300" />
+        </div>
+
+        <!-- Category + Date -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-500 font-medium mb-1 block">Kategori</label>
+            <select id="tx-category"
+              class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-slate-700 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white">
+              <optgroup label="Pengeluaran">
+                <option value="Makanan &amp; Minuman">🍜 Makanan</option>
+                <option value="Transportasi">🚌 Transportasi</option>
+                <option value="Belanja">🛍️ Belanja</option>
+                <option value="Kesehatan">💊 Kesehatan</option>
+                <option value="Hiburan">🎮 Hiburan</option>
+                <option value="Tagihan">📱 Tagihan</option>
+                <option value="Pendidikan">📚 Pendidikan</option>
+              </optgroup>
+              <optgroup label="Pemasukan">
+                <option value="Gaji">💼 Gaji</option>
+                <option value="Freelance">💻 Freelance</option>
+                <option value="Bisnis">🏪 Bisnis</option>
+                <option value="Investasi">📈 Investasi</option>
+                <option value="Hadiah">🎁 Hadiah</option>
+              </optgroup>
+              <option value="Lainnya">✨ Lainnya</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500 font-medium mb-1 block">Tanggal</label>
+            <input type="date" id="tx-date" required
+              class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-slate-700 text-sm
+                     focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+          </div>
+        </div>
+
+        <!-- Note -->
+        <input type="text" id="tx-note" placeholder="Catatan (opsional)" maxlength="100"
+          class="w-full px-4 py-3 border border-slate-200 rounded-xl text-slate-700 text-sm
+                 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-slate-300" />
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-btn"
+          class="w-full py-3 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold
+                 rounded-xl shadow-md shadow-primary-500/30 text-sm transition-all">
+          Simpan Transaksi
+        </button>
+      </form>
+    </section>
+
+    <!-- ===== TRANSACTION HISTORY ===== -->
+    <section class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-50">
+        <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
+          <span class="bg-slate-100 text-slate-500 w-7 h-7 rounded-lg flex items-center justify-center text-sm">📋</span>
+          Riwayat Transaksi
+        </h2>
+        <span id="tx-count" class="text-xs text-slate-400 font-medium">Memuat...</span>
+      </div>
+
+      <!-- Transaction List -->
+      <ul id="transaction-list" class="divide-y divide-slate-50">
+        <!-- Skeleton loaders -->
+        <li class="px-5 py-4 flex items-center gap-3">
+          <span class="skeleton w-10 h-10 rounded-xl inline-block flex-shrink-0"></span>
+          <div class="flex-1 space-y-2">
+            <span class="skeleton h-3.5 w-28 rounded inline-block"></span>
+            <span class="skeleton h-3 w-20 rounded inline-block"></span>
+          </div>
+          <span class="skeleton h-4 w-20 rounded inline-block"></span>
+        </li>
+        <li class="px-5 py-4 flex items-center gap-3">
+          <span class="skeleton w-10 h-10 rounded-xl inline-block flex-shrink-0"></span>
+          <div class="flex-1 space-y-2">
+            <span class="skeleton h-3.5 w-32 rounded inline-block"></span>
+            <span class="skeleton h-3 w-24 rounded inline-block"></span>
+          </div>
+          <span class="skeleton h-4 w-16 rounded inline-block"></span>
+        </li>
+      </ul>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="hidden text-center py-12 px-5">
+        <div class="text-5xl mb-3">🪙</div>
+        <p class="text-slate-500 font-medium text-sm">Belum ada transaksi</p>
+        <p class="text-slate-400 text-xs mt-1">Tambahkan transaksi pertama Anda di atas!</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div id="toast"
+    class="fixed bottom-6 left-1/2 -translate-x-1/2 opacity-0 pointer-events-none z-50
+           px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-semibold flex items-center gap-2 max-w-xs">
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="modal-overlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full">
+      <div class="text-center mb-4">
+        <span class="text-4xl block mb-2">🗑️</span>
+        <h3 class="text-slate-800 font-bold text-base">Hapus Transaksi?</h3>
+        <p class="text-slate-500 text-sm mt-1">Tindakan ini tidak bisa dibatalkan.</p>
+      </div>
+      <div class="flex gap-3 mt-5">
+        <button id="modal-cancel"
+          class="flex-1 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50">
+          Batal
+        </button>
+        <button id="modal-confirm"
+          class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold shadow-md shadow-red-500/30">
+          Hapus
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- App JS (Module) -->
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

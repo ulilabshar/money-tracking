@@ -1,0 +1,9 @@
+﻿{
+  "version": 2,
+  "buildCommand": "",
+  "outputDirectory": ".",
+  "routes": [
+    { "src": "/sw.js", "headers": { "Cache-Control": "no-cache, no-store, must-revalidate" }, "dest": "/sw.js" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
