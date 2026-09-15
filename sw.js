@@ -1,4 +1,4 @@
-﻿/* sw.js - DompetKu Service Worker */
+/* sw.js - DompetKu Service Worker */
 const CACHE_NAME = 'dompetku-v1';
 const STATIC_ASSETS = [
   '/',

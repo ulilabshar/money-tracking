@@ -1,4 +1,4 @@
-﻿# DompetKu PWA
+# DompetKu PWA
 
 Aplikasi pencatat keuangan (Expense & Income Tracker) berbasis PWA.
 
