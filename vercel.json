@@ -1,9 +1,1 @@
-﻿{
-  "version": 2,
-  "buildCommand": "",
-  "outputDirectory": ".",
-  "routes": [
-    { "src": "/sw.js", "headers": { "Cache-Control": "no-cache, no-store, must-revalidate" }, "dest": "/sw.js" },
-    { "src": "/(.*)", "dest": "/$1" }
-  ]
-}
+{"version":2,"name":"dompetku","buildCommand":"","outputDirectory":".","headers":[{"source":"/sw.js","headers":[{"key":"Cache-Control","value":"no-cache, no-store, must-revalidate"}]}]}
