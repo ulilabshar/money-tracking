@@ -107,18 +107,39 @@ loginForm.addEventListener('submit', async (e) => {
   loginBtn.textContent = 'Memuat...';
   loginError.classList.add('hidden');
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email:    loginEmailEl.value.trim(),
-    password: loginPassEl.value,
-  });
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email:    loginEmailEl.value.trim(),
+      password: loginPassEl.value,
+    });
 
-  if (error) {
-    loginError.textContent = 'Email atau password salah. Coba lagi.';
+    if (error) {
+      const msg = error.message?.toLowerCase() ?? '';
+      let display = 'Login gagal. Coba lagi.';
+      if (msg.includes('invalid login') || msg.includes('invalid credentials') || msg.includes('wrong'))
+        display = 'Email atau password salah.';
+      else if (msg.includes('email not confirmed'))
+        display = 'Email belum dikonfirmasi. Cek inbox Anda.';
+      else if (msg.includes('user not found'))
+        display = 'Akun tidak ditemukan di Supabase.';
+      else if (msg.includes('network') || msg.includes('fetch'))
+        display = 'Tidak ada koneksi internet.';
+      else
+        display = error.message;
+
+      loginError.textContent = display;
+      loginError.classList.remove('hidden');
+    }
+    // success -> onAuthStateChange handles showing the app
+  } catch (err) {
+    console.error('Login exception:', err);
+    loginError.textContent = 'Error: ' + (err.message ?? 'coba lagi.');
     loginError.classList.remove('hidden');
+  } finally {
+    // Selalu reset button apapun yang terjadi
     loginBtn.disabled    = false;
     loginBtn.textContent = 'Masuk';
   }
-  // success -> onAuthStateChange handles the rest
 });
 
 // Logout
