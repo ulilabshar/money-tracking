@@ -6,8 +6,8 @@
 // ── 1. SUPABASE CONFIGURATION ────────────────────────────────
 // Ganti dua nilai di bawah ini dengan kredensial dari dashboard Supabase Anda.
 // Settings > API > Project URL & anon public key
-const SUPABASE_URL     = 'YOUR_SUPABASE_URL';       // contoh: https://xxxx.supabase.co
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // string panjang
+const SUPABASE_URL      = 'https://opslmnkzfctqvolikhxy.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Vnt6JGZrg86G1lANpo676A_bNw3OUyC';
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
