@@ -165,22 +165,40 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
 });
 
 // -- 6. TYPE TOGGLE -------------------------------------------
+const catExpenseGroup = document.getElementById('cat-expense');
+const catIncomeGroup  = document.getElementById('cat-income');
+
 function setType(type) {
   txTypeInput.value = type;
+
   if (type === 'income') {
+    // Toggle button styles
     btnIncome.classList.add('bg-income','text-white','shadow-sm');
     btnIncome.classList.remove('text-slate-500');
     btnExpense.classList.remove('bg-expense','text-white','shadow-sm');
     btnExpense.classList.add('text-slate-500');
+    // Show income categories, hide expense categories
+    catIncomeGroup.hidden  = false;
+    catExpenseGroup.hidden = true;
+    // Auto-select first income option
+    categoryInput.value = catIncomeGroup.querySelector('option').value;
   } else {
+    // Toggle button styles
     btnExpense.classList.add('bg-expense','text-white','shadow-sm');
     btnExpense.classList.remove('text-slate-500');
     btnIncome.classList.remove('bg-income','text-white','shadow-sm');
     btnIncome.classList.add('text-slate-500');
+    // Show expense categories, hide income categories
+    catExpenseGroup.hidden = false;
+    catIncomeGroup.hidden  = true;
+    // Auto-select first expense option
+    categoryInput.value = catExpenseGroup.querySelector('option').value;
   }
 }
 btnIncome.addEventListener('click', () => setType('income'));
 btnExpense.addEventListener('click', () => setType('expense'));
+// Set default state on load: income selected, expense categories hidden
+setType('income');
 dateInput.value = new Date().toISOString().split('T')[0];
 
 // -- 7. MONTH NAVIGATION --------------------------------------
