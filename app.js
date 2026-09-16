@@ -255,7 +255,7 @@ function renderSummaryAll(rows) {
   const exp = rows.filter(r => r.type === 'expense').reduce((s, r) => s + +r.amount, 0);
   const bal = inc - exp;
   balanceEl.textContent      = formatRupiah(bal);
-  balanceEl.className        = `text-4xl font-black tracking-tight drop-shadow ${bal < 0 ? 'text-red-200' : 'text-white'}`;
+  balanceEl.className        = `text-4xl font-black tracking-tight ${bal < 0 ? 'text-red-500 dark:text-red-400' : 'text-slate-900 dark:text-white'}`;
   totalIncomeEl.textContent  = formatRupiah(inc);
   totalExpenseEl.textContent = formatRupiah(exp);
 }

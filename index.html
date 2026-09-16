@@ -94,20 +94,19 @@
 ================================================= -->
 <div id="login-page"
   class="fixed inset-0 z-50 flex items-center justify-center p-5
-         bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-800
-         dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950">
+         bg-white dark:bg-black">
   <div class="w-full max-w-sm fade-in-card">
     <!-- Card -->
     <div class="bg-white dark:bg-zinc-950 rounded-3xl shadow-2xl p-8
-                dark:border dark:border-zinc-800">
+                border border-slate-100 dark:border-zinc-800">
       <!-- Logo -->
       <div class="text-center mb-8">
-        <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-indigo-600
-                    rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-500/30">
+        <div class="w-16 h-16 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
+                    rounded-2xl flex items-center justify-center mx-auto mb-4">
           <span class="text-3xl">💰</span>
         </div>
         <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">DompetKu</h1>
-        <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Masuk untuk melanjutkan</p>
+        <p class="text-slate-400 dark:text-zinc-500 text-sm mt-1">Masuk untuk melanjutkan</p>
       </div>
       <!-- Form -->
       <form id="login-form" class="space-y-3" novalidate>
@@ -115,29 +114,29 @@
           <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">✉️</span>
           <input type="email" id="login-email" placeholder="Email" required autocomplete="email"
             class="w-full pl-10 pr-4 py-3.5 rounded-2xl text-sm font-medium
-                   bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
-                   text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500
+                   bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
+                   text-slate-800 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600
                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
         </div>
         <div class="relative">
           <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">🔒</span>
           <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password"
             class="w-full pl-10 pr-4 py-3.5 rounded-2xl text-sm font-medium
-                   bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
-                   text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500
+                   bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
+                   text-slate-800 dark:text-zinc-100 placeholder-slate-400 dark:placeholder-zinc-600
                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
         </div>
         <p id="login-error"
           class="hidden text-red-500 dark:text-red-400 text-xs text-center py-2 px-3 rounded-xl
                  bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/40"></p>
         <button type="submit" id="login-btn"
-          class="w-full py-3.5 mt-1 bg-gradient-to-r from-primary-500 to-indigo-600
-                 hover:from-primary-600 hover:to-indigo-700 text-white font-bold rounded-2xl
-                 shadow-lg shadow-primary-500/30 text-sm transition-all active:scale-[.98]">
+          class="w-full py-3.5 mt-1 bg-primary-500 hover:bg-primary-600 active:bg-primary-700
+                 text-white font-bold rounded-2xl shadow-md shadow-primary-500/20
+                 text-sm transition-all active:scale-[.98]">
           Masuk
         </button>
       </form>
-      <p class="text-center text-slate-400 dark:text-slate-600 text-xs mt-6">Keuangan pribadi Anda 🔐</p>
+      <p class="text-center text-slate-400 dark:text-zinc-600 text-xs mt-6">Keuangan pribadi Anda 🔐</p>
     </div>
   </div>
 </div>
@@ -146,65 +145,65 @@
 <!-- ================================================
      HEADER
 ================================================= -->
-<header class="bg-gradient-to-br from-primary-500 via-primary-600 to-indigo-700 text-white relative overflow-hidden">
-  <!-- Decorative blobs -->
-  <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-  <div class="absolute bottom-0 left-0 w-40 h-40 bg-black/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-
-  <div class="max-w-lg mx-auto px-4 pt-12 pb-24 relative">
+<header class="bg-white dark:bg-black border-b border-slate-100 dark:border-zinc-900">
+  <div class="max-w-lg mx-auto px-4 pt-10 pb-20">
     <!-- Top bar -->
     <div class="flex items-center justify-between mb-1">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-lg">💰</div>
-        <span class="font-bold text-lg tracking-tight">DompetKu</span>
+        <div class="w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
+                    rounded-xl flex items-center justify-center text-lg">💰</div>
+        <span class="font-bold text-lg tracking-tight text-slate-900 dark:text-white">DompetKu</span>
       </div>
       <div class="flex items-center gap-1.5">
         <!-- Theme toggle -->
         <button id="theme-toggle"
-          class="w-9 h-9 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center
-                 text-base transition-all active:scale-95 no-select" title="Ganti tema">
+          class="w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
+                 rounded-xl flex items-center justify-center text-base transition-all active:scale-95 no-select"
+          title="Ganti tema">
           🌙
         </button>
         <!-- Install PWA -->
         <button id="pwa-install-btn"
-          class="hidden w-9 h-9 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center text-base transition-all">
+          class="hidden w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
+                 rounded-xl flex items-center justify-center text-base transition-all">
           📲
         </button>
         <!-- Logout -->
         <button id="logout-btn"
-          class="text-xs font-semibold bg-white/15 hover:bg-white/25 px-3 py-2 rounded-xl
-                 border border-white/20 transition-all active:scale-95">
+          class="text-xs font-semibold bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800
+                 text-slate-600 dark:text-zinc-300 px-3 py-2 rounded-xl
+                 border border-slate-200 dark:border-zinc-800 transition-all active:scale-95">
           Keluar →
         </button>
       </div>
     </div>
-    <p id="user-email" class="text-primary-200/70 text-xs mb-6 truncate"></p>
+    <p id="user-email" class="text-slate-400 dark:text-zinc-600 text-xs mb-6 truncate"></p>
 
     <!-- Balance Card -->
-    <div class="bg-white/15 backdrop-blur-md rounded-3xl p-5 border border-white/20 mb-3 shadow-lg shadow-black/10">
-      <p class="text-primary-100/80 text-xs font-semibold uppercase tracking-widest mb-2">Saldo Keseluruhan</p>
-      <p id="balance-amount" class="text-4xl font-black tracking-tight text-white drop-shadow">
+    <div class="bg-slate-50 dark:bg-zinc-950 rounded-3xl p-5 border border-slate-200 dark:border-zinc-800 mb-3">
+      <p class="text-slate-400 dark:text-zinc-500 text-xs font-semibold uppercase tracking-widest mb-2">Saldo Keseluruhan</p>
+      <p id="balance-amount" class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">
         <span class="skeleton h-10 w-44 inline-block rounded-xl"></span>
       </p>
     </div>
 
     <!-- Income / Expense Mini Cards -->
     <div class="grid grid-cols-2 gap-3">
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15">
+      <div class="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/40">
         <div class="flex items-center gap-2 mb-2">
-          <div class="w-6 h-6 bg-emerald-400/25 rounded-lg flex items-center justify-center text-xs">⬆</div>
-          <p class="text-emerald-100 text-xs font-semibold">Pemasukan</p>
+          <div class="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center text-xs">⬆</div>
+          <p class="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">Pemasukan</p>
         </div>
-        <p id="total-income" class="text-white font-bold text-sm leading-tight">
+        <p id="total-income" class="text-emerald-700 dark:text-emerald-300 font-bold text-sm leading-tight">
           <span class="skeleton h-4 w-20 inline-block"></span>
         </p>
       </div>
-      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15">
+      <div class="bg-red-50 dark:bg-red-950/30 rounded-2xl p-4 border border-red-100 dark:border-red-900/40">
         <div class="flex items-center gap-2 mb-2">
-          <div class="w-6 h-6 bg-red-400/25 rounded-lg flex items-center justify-center text-xs">⬇</div>
-          <p class="text-red-100 text-xs font-semibold">Pengeluaran</p>
+          <div class="w-6 h-6 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center text-xs">⬇</div>
+          <p class="text-red-500 dark:text-red-400 text-xs font-semibold">Pengeluaran</p>
         </div>
-        <p id="total-expense" class="text-white font-bold text-sm leading-tight">
+        <p id="total-expense" class="text-red-600 dark:text-red-300 font-bold text-sm leading-tight">
           <span class="skeleton h-4 w-20 inline-block"></span>
         </p>
       </div>
