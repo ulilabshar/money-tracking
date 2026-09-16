@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,244 +13,446 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            primary: { 50:'#eef2ff',100:'#e0e7ff',500:'#6366f1',600:'#4f46e5',700:'#4338ca' },
-            income:  { DEFAULT:'#10b981', light:'#d1fae5' },
-            expense: { DEFAULT:'#ef4444', light:'#fee2e2' },
+            primary: {
+              50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',
+              400:'#818cf8',500:'#6366f1',600:'#4f46e5',
+              700:'#4338ca',800:'#3730a3',900:'#312e81',950:'#1e1b4b'
+            },
           },
           fontFamily: { sans:['Inter','system-ui','sans-serif'] },
+          boxShadow: {
+            'card':     '0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04)',
+            'card-lg':  '0 4px 16px rgba(0,0,0,.08)',
+            'card-dark':'0 1px 3px rgba(0,0,0,.4)',
+          }
         }
       }
     }
   </script>
+
+  <!-- Anti-flash: apply saved theme BEFORE first paint -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('dk-theme');
+      var sys = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (t === 'dark' || (t === null && sys)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
+  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
   <style>
-    ::-webkit-scrollbar{width:6px}
-    ::-webkit-scrollbar-track{background:#f1f5f9}
+    /* ---- Scrollbar ---- */
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-track{background:transparent}
     ::-webkit-scrollbar-thumb{background:#c7d2fe;border-radius:9999px}
+    .dark ::-webkit-scrollbar-thumb{background:#334155}
+
+    /* ---- Smooth theme transition ---- */
+    body,main,header,section,div,input,select,button,ul,li,p,span,h1,h2,h3 {
+      transition: background-color .2s ease, border-color .2s ease, color .15s ease;
+    }
+
+    /* ---- Animations ---- */
     @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-    .skeleton{background:linear-gradient(90deg,#e2e8f0 25%,#f8fafc 50%,#e2e8f0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
-    @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    .fade-in{animation:fadeInUp 0.3s ease-out forwards}
-    @keyframes fadeInScale{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
-    .fade-in-card{animation:fadeInScale 0.35s ease-out forwards}
+    .skeleton{
+      background:linear-gradient(90deg,#e2e8f0 25%,#f8fafc 50%,#e2e8f0 75%);
+      background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:.5rem
+    }
+    .dark .skeleton{
+      background:linear-gradient(90deg,#1e293b 25%,#334155 50%,#1e293b 75%);
+      background-size:200% 100%
+    }
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeInUp .3s ease-out forwards}
+    @keyframes fadeInScale{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+    .fade-in-card{animation:fadeInScale .35s cubic-bezier(.34,1.56,.64,1) forwards}
+
+    /* ---- No select on toggles ---- */
+    .no-select{-webkit-user-select:none;user-select:none}
   </style>
 </head>
-<body class="bg-slate-100 font-sans min-h-screen antialiased">
 
-  <!-- ===== LOGIN PAGE ===== -->
-  <div id="login-page" class="fixed inset-0 bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-900 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-sm fade-in-card">
+<body class="bg-slate-50 dark:bg-slate-950 font-sans min-h-screen antialiased">
+
+<!-- ================================================
+     LOGIN PAGE
+================================================= -->
+<div id="login-page"
+  class="fixed inset-0 z-50 flex items-center justify-center p-5
+         bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-800
+         dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950">
+  <div class="w-full max-w-sm fade-in-card">
+    <!-- Card -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-8
+                dark:border dark:border-slate-700/60">
+      <!-- Logo -->
       <div class="text-center mb-8">
-        <div class="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-500/20">
+        <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-indigo-600
+                    rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-500/30">
           <span class="text-3xl">💰</span>
         </div>
-        <h1 class="text-2xl font-extrabold text-slate-800">DompetKu</h1>
-        <p class="text-slate-400 text-sm mt-1">Masuk untuk melanjutkan</p>
+        <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">DompetKu</h1>
+        <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Masuk untuk melanjutkan</p>
       </div>
+      <!-- Form -->
       <form id="login-form" class="space-y-3" novalidate>
         <div class="relative">
-          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base select-none">✉️</span>
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">✉️</span>
           <input type="email" id="login-email" placeholder="Email" required autocomplete="email"
-            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-slate-300" />
+            class="w-full pl-10 pr-4 py-3.5 rounded-2xl text-sm font-medium
+                   bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+                   text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500
+                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
         </div>
         <div class="relative">
-          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base select-none">🔒</span>
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">🔒</span>
           <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password"
-            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-slate-300" />
+            class="w-full pl-10 pr-4 py-3.5 rounded-2xl text-sm font-medium
+                   bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+                   text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500
+                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
         </div>
-        <p id="login-error" class="hidden text-red-500 text-xs text-center bg-red-50 py-2 px-3 rounded-lg border border-red-100"></p>
+        <p id="login-error"
+          class="hidden text-red-500 dark:text-red-400 text-xs text-center py-2 px-3 rounded-xl
+                 bg-red-50 dark:bg-red-950/40 border border-red-100 dark:border-red-900/40"></p>
         <button type="submit" id="login-btn"
-          class="w-full py-3.5 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-bold rounded-xl shadow-lg shadow-primary-500/30 text-sm transition-all mt-1">
+          class="w-full py-3.5 mt-1 bg-gradient-to-r from-primary-500 to-indigo-600
+                 hover:from-primary-600 hover:to-indigo-700 text-white font-bold rounded-2xl
+                 shadow-lg shadow-primary-500/30 text-sm transition-all active:scale-[.98]">
           Masuk
         </button>
       </form>
-      <p class="text-center text-slate-400 text-xs mt-6">Aplikasi keuangan pribadi Anda 🔐</p>
+      <p class="text-center text-slate-400 dark:text-slate-600 text-xs mt-6">Keuangan pribadi Anda 🔐</p>
     </div>
   </div>
+</div>
 
-  <!-- ===== HEADER ===== -->
-  <header class="bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-lg">
-    <div class="max-w-lg mx-auto px-4 pt-10 pb-20">
-      <div class="flex items-center justify-between mb-0.5">
-        <div class="flex items-center gap-2">
-          <span class="text-2xl">💰</span>
-          <h1 class="text-xl font-bold tracking-tight">DompetKu</h1>
-        </div>
-        <div class="flex items-center gap-2">
-          <button id="pwa-install-btn" class="hidden text-xs font-semibold bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-full border border-white/30">
-            📲 Install
-          </button>
-          <button id="logout-btn" class="text-xs font-semibold bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-full border border-white/30 flex items-center gap-1">
-            Keluar <span class="opacity-70">→</span>
-          </button>
-        </div>
+
+<!-- ================================================
+     HEADER
+================================================= -->
+<header class="bg-gradient-to-br from-primary-500 via-primary-600 to-indigo-700 text-white relative overflow-hidden">
+  <!-- Decorative blobs -->
+  <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+  <div class="absolute bottom-0 left-0 w-40 h-40 bg-black/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+
+  <div class="max-w-lg mx-auto px-4 pt-12 pb-24 relative">
+    <!-- Top bar -->
+    <div class="flex items-center justify-between mb-1">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-lg">💰</div>
+        <span class="font-bold text-lg tracking-tight">DompetKu</span>
       </div>
-      <p id="user-email" class="text-primary-200 text-xs opacity-80 truncate mb-5"></p>
-
-      <!-- All-time Summary -->
-      <div class="grid grid-cols-3 gap-3">
-        <div class="col-span-3 bg-white/15 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-          <p class="text-primary-100 text-xs font-medium uppercase tracking-wider">Saldo Keseluruhan</p>
-          <p id="balance-amount" class="text-3xl font-extrabold mt-1 tracking-tight text-white">
-            <span class="skeleton h-8 w-36 rounded-lg inline-block"></span>
-          </p>
-        </div>
-        <div class="col-span-1 bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/15">
-          <p class="text-green-200 text-xs font-medium">⬆ Masuk</p>
-          <p id="total-income" class="text-white font-bold text-sm mt-1"><span class="skeleton h-4 w-14 rounded inline-block"></span></p>
-        </div>
-        <div class="col-span-2 bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/15">
-          <p class="text-red-200 text-xs font-medium">⬇ Keluar</p>
-          <p id="total-expense" class="text-white font-bold text-sm mt-1"><span class="skeleton h-4 w-20 rounded inline-block"></span></p>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- ===== MAIN ===== -->
-  <main class="max-w-lg mx-auto px-4 -mt-10 pb-24 space-y-5">
-
-    <!-- Add Transaction -->
-    <section class="bg-white rounded-2xl shadow-md p-5 border border-slate-100">
-      <h2 class="text-base font-semibold text-slate-700 mb-4 flex items-center gap-2">
-        <span class="bg-primary-50 text-primary-500 w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold">+</span>
-        Tambah Transaksi
-      </h2>
-      <form id="transaction-form" class="space-y-4" novalidate>
-        <div class="flex gap-2 p-1 bg-slate-100 rounded-xl">
-          <button type="button" id="btn-income" class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all bg-income text-white shadow-sm">⬆ Pemasukan</button>
-          <button type="button" id="btn-expense" class="flex-1 py-2 rounded-lg text-sm font-semibold transition-all text-slate-500">⬇ Pengeluaran</button>
-        </div>
-        <input type="hidden" id="tx-type" value="income" />
-        <div class="relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-semibold text-sm">Rp</span>
-          <input type="number" id="tx-amount" placeholder="0" min="1" required
-            class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-slate-800 font-semibold text-base focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent placeholder-slate-300" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-xs text-slate-500 font-medium mb-1 block">Kategori</label>
-            <select id="tx-category" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white">
-              <optgroup id="cat-expense" label="Pengeluaran">
-                <option value="Makanan &amp; Minuman">🍜 Makanan</option>
-                <option value="Transportasi">🚌 Transportasi</option>
-                <option value="Belanja">🛍️ Belanja</option>
-                <option value="Kesehatan">💊 Kesehatan</option>
-                <option value="Hiburan">🎮 Hiburan</option>
-                <option value="Tagihan">📱 Tagihan</option>
-                <option value="Pendidikan">📚 Pendidikan</option>
-              </optgroup>
-              <optgroup id="cat-income" label="Pemasukan">
-                <option value="Gaji">💼 Gaji</option>
-                <option value="Freelance">💻 Freelance</option>
-                <option value="Bisnis">🏪 Bisnis</option>
-                <option value="Investasi">📈 Investasi</option>
-                <option value="Hadiah">🎁 Hadiah</option>
-              </optgroup>
-              <option value="Lainnya">✨ Lainnya</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-xs text-slate-500 font-medium mb-1 block">Tanggal</label>
-            <input type="date" id="tx-date" required
-              class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500" />
-          </div>
-        </div>
-        <input type="text" id="tx-note" placeholder="Catatan (opsional)" maxlength="100"
-          class="w-full px-4 py-3 border border-slate-200 rounded-xl text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-slate-300" />
-        <button type="submit" id="submit-btn"
-          class="w-full py-3 bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-semibold rounded-xl shadow-md shadow-primary-500/30 text-sm transition-all">
-          Simpan Transaksi
+      <div class="flex items-center gap-1.5">
+        <!-- Theme toggle -->
+        <button id="theme-toggle"
+          class="w-9 h-9 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center
+                 text-base transition-all active:scale-95 no-select" title="Ganti tema">
+          🌙
         </button>
-      </form>
-    </section>
-
-    <!-- History -->
-    <section class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden">
-      <!-- Header -->
-      <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-        <h2 class="text-base font-semibold text-slate-700 flex items-center gap-2">
-          <span class="bg-slate-100 text-slate-500 w-7 h-7 rounded-lg flex items-center justify-center text-sm">📋</span>
-          Riwayat
-        </h2>
-        <span id="tx-count" class="text-xs text-slate-400 font-medium bg-slate-50 px-2.5 py-1 rounded-full border border-slate-100">Memuat...</span>
+        <!-- Install PWA -->
+        <button id="pwa-install-btn"
+          class="hidden w-9 h-9 bg-white/15 hover:bg-white/25 rounded-xl flex items-center justify-center text-base transition-all">
+          📲
+        </button>
+        <!-- Logout -->
+        <button id="logout-btn"
+          class="text-xs font-semibold bg-white/15 hover:bg-white/25 px-3 py-2 rounded-xl
+                 border border-white/20 transition-all active:scale-95">
+          Keluar →
+        </button>
       </div>
+    </div>
+    <p id="user-email" class="text-primary-200/70 text-xs mb-6 truncate"></p>
 
-      <!-- Month Navigator -->
-      <div class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-100">
-        <button id="prev-month" class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-primary-50 hover:border-primary-200 hover:text-primary-600 font-bold text-lg shadow-sm transition-all flex-shrink-0">‹</button>
-        <p id="month-label" class="flex-1 text-center text-slate-700 font-bold text-sm"></p>
-        <button id="next-month" class="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-primary-50 hover:border-primary-200 hover:text-primary-600 font-bold text-lg shadow-sm transition-all flex-shrink-0">›</button>
-      </div>
+    <!-- Balance Card -->
+    <div class="bg-white/15 backdrop-blur-md rounded-3xl p-5 border border-white/20 mb-3 shadow-lg shadow-black/10">
+      <p class="text-primary-100/80 text-xs font-semibold uppercase tracking-widest mb-2">Saldo Keseluruhan</p>
+      <p id="balance-amount" class="text-4xl font-black tracking-tight text-white drop-shadow">
+        <span class="skeleton h-10 w-44 inline-block rounded-xl"></span>
+      </p>
+    </div>
 
-      <!-- Monthly Summary -->
-      <div class="px-4 pt-4 pb-3 border-b border-slate-100">
-        <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-2.5">Ringkasan Bulan Ini</p>
-        <div class="grid grid-cols-3 gap-2">
-          <div class="bg-emerald-50 rounded-xl p-3 text-center border border-emerald-100">
-            <p class="text-xs text-emerald-600 font-semibold mb-1.5">⬆ Pemasukan</p>
-            <p id="monthly-income" class="text-emerald-700 font-extrabold text-xs">Rp 0</p>
-          </div>
-          <div class="bg-red-50 rounded-xl p-3 text-center border border-red-100">
-            <p class="text-xs text-red-500 font-semibold mb-1.5">⬇ Pengeluaran</p>
-            <p id="monthly-expense" class="text-red-600 font-extrabold text-xs">Rp 0</p>
-          </div>
-          <div class="bg-primary-50 rounded-xl p-3 text-center border border-primary-100">
-            <p class="text-xs text-primary-600 font-semibold mb-1.5">💰 Saldo</p>
-            <p id="monthly-balance" class="text-primary-700 font-extrabold text-xs">Rp 0</p>
-          </div>
+    <!-- Income / Expense Mini Cards -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-6 h-6 bg-emerald-400/25 rounded-lg flex items-center justify-center text-xs">⬆</div>
+          <p class="text-emerald-100 text-xs font-semibold">Pemasukan</p>
         </div>
+        <p id="total-income" class="text-white font-bold text-sm leading-tight">
+          <span class="skeleton h-4 w-20 inline-block"></span>
+        </p>
       </div>
-
-      <!-- List -->
-      <ul id="transaction-list" class="divide-y divide-slate-50">
-        <li class="px-5 py-4 flex items-center gap-3">
-          <span class="skeleton w-10 h-10 rounded-xl inline-block flex-shrink-0"></span>
-          <div class="flex-1 space-y-2"><span class="skeleton h-3.5 w-28 rounded inline-block"></span><span class="skeleton h-3 w-20 rounded inline-block"></span></div>
-          <span class="skeleton h-4 w-20 rounded inline-block"></span>
-        </li>
-        <li class="px-5 py-4 flex items-center gap-3">
-          <span class="skeleton w-10 h-10 rounded-xl inline-block flex-shrink-0"></span>
-          <div class="flex-1 space-y-2"><span class="skeleton h-3.5 w-32 rounded inline-block"></span><span class="skeleton h-3 w-24 rounded inline-block"></span></div>
-          <span class="skeleton h-4 w-16 rounded inline-block"></span>
-        </li>
-      </ul>
-
-      <!-- Empty State -->
-      <div id="empty-state" class="hidden text-center py-14 px-5">
-        <div class="text-5xl mb-3">🗓️</div>
-        <p class="text-slate-500 font-semibold text-sm">Tidak ada transaksi</p>
-        <p class="text-slate-400 text-xs mt-1">Belum ada transaksi pada bulan ini.</p>
-      </div>
-    </section>
-  </main>
-
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-semibold items-center gap-2 max-w-xs hidden"></div>
-
-  <!-- Delete Modal -->
-  <div id="modal-overlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full fade-in-card">
-      <div class="text-center mb-4">
-        <span class="text-4xl block mb-2">🗑️</span>
-        <h3 class="text-slate-800 font-bold text-base">Hapus Transaksi?</h3>
-        <p class="text-slate-500 text-sm mt-1">Tindakan ini tidak bisa dibatalkan.</p>
-      </div>
-      <div class="flex gap-3 mt-5">
-        <button id="modal-cancel" class="flex-1 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50">Batal</button>
-        <button id="modal-confirm" class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-sm font-semibold shadow-md shadow-red-500/30">Hapus</button>
+      <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/15">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-6 h-6 bg-red-400/25 rounded-lg flex items-center justify-center text-xs">⬇</div>
+          <p class="text-red-100 text-xs font-semibold">Pengeluaran</p>
+        </div>
+        <p id="total-expense" class="text-white font-bold text-sm leading-tight">
+          <span class="skeleton h-4 w-20 inline-block"></span>
+        </p>
       </div>
     </div>
   </div>
+</header>
 
-  <script type="module" src="/app.js"></script>
+
+<!-- ================================================
+     MAIN
+================================================= -->
+<main class="max-w-lg mx-auto px-4 -mt-12 pb-28 space-y-4">
+
+  <!-- ── Add Transaction ── -->
+  <section class="bg-white dark:bg-slate-900 rounded-3xl shadow-card dark:shadow-card-dark
+                  border border-slate-100 dark:border-slate-800 p-5">
+    <h2 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+      <span class="w-5 h-5 bg-primary-100 dark:bg-primary-900/50 text-primary-500 rounded-lg flex items-center justify-center text-xs font-black">+</span>
+      Tambah Transaksi
+    </h2>
+
+    <form id="transaction-form" class="space-y-3.5" novalidate>
+      <!-- Type Toggle -->
+      <div class="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+        <button type="button" id="btn-income"
+          class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all no-select
+                 bg-emerald-500 text-white shadow-sm shadow-emerald-500/30">
+          ⬆ Pemasukan
+        </button>
+        <button type="button" id="btn-expense"
+          class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all no-select
+                 text-slate-400 dark:text-slate-500">
+          ⬇ Pengeluaran
+        </button>
+      </div>
+      <input type="hidden" id="tx-type" value="income" />
+
+      <!-- Amount -->
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-sm">Rp</span>
+        <input type="number" id="tx-amount" placeholder="0" min="1" required
+          class="w-full pl-12 pr-4 py-3.5 rounded-2xl font-bold text-lg
+                 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+                 text-slate-800 dark:text-slate-100 placeholder-slate-300 dark:placeholder-slate-600
+                 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+      </div>
+
+      <!-- Category + Date -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1.5 block">Kategori</label>
+          <select id="tx-category"
+            class="w-full px-3.5 py-3 rounded-2xl text-sm font-medium
+                   bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+                   text-slate-700 dark:text-slate-200
+                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            <optgroup id="cat-expense" label="Pengeluaran">
+              <option value="Makanan &amp; Minuman">🍜 Makanan</option>
+              <option value="Transportasi">🚌 Transportasi</option>
+              <option value="Belanja">🛍️ Belanja</option>
+              <option value="Kesehatan">💊 Kesehatan</option>
+              <option value="Hiburan">🎮 Hiburan</option>
+              <option value="Tagihan">📱 Tagihan</option>
+              <option value="Pendidikan">📚 Pendidikan</option>
+            </optgroup>
+            <optgroup id="cat-income" label="Pemasukan">
+              <option value="Gaji">💼 Gaji</option>
+              <option value="Freelance">💻 Freelance</option>
+              <option value="Bisnis">🏪 Bisnis</option>
+              <option value="Investasi">📈 Investasi</option>
+              <option value="Hadiah">🎁 Hadiah</option>
+            </optgroup>
+            <option value="Lainnya">✨ Lainnya</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-500 dark:text-slate-400 font-semibold mb-1.5 block">Tanggal</label>
+          <input type="date" id="tx-date" required
+            class="w-full px-3.5 py-3 rounded-2xl text-sm font-medium
+                   bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+                   text-slate-700 dark:text-slate-200
+                   focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+        </div>
+      </div>
+
+      <!-- Note -->
+      <input type="text" id="tx-note" placeholder="Catatan (opsional)" maxlength="100"
+        class="w-full px-4 py-3.5 rounded-2xl text-sm font-medium
+               bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+               text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600
+               focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+
+      <!-- Submit -->
+      <button type="submit" id="submit-btn"
+        class="w-full py-3.5 bg-gradient-to-r from-primary-500 to-indigo-600
+               hover:from-primary-600 hover:to-indigo-700 text-white font-bold rounded-2xl
+               shadow-lg shadow-primary-500/25 text-sm transition-all active:scale-[.98]">
+        Simpan Transaksi
+      </button>
+    </form>
+  </section>
+
+
+  <!-- ── Transaction History ── -->
+  <section class="bg-white dark:bg-slate-900 rounded-3xl shadow-card dark:shadow-card-dark
+                  border border-slate-100 dark:border-slate-800 overflow-hidden">
+
+    <!-- Section Header -->
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+      <h2 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+        <span class="w-5 h-5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg flex items-center justify-center text-xs">📋</span>
+        Riwayat
+      </h2>
+      <span id="tx-count"
+        class="text-xs font-semibold text-slate-400 dark:text-slate-500
+               bg-slate-50 dark:bg-slate-800 px-2.5 py-1 rounded-full
+               border border-slate-100 dark:border-slate-700">
+        Memuat...
+      </span>
+    </div>
+
+    <!-- Month Navigator -->
+    <div class="flex items-center gap-3 px-4 py-3
+                bg-slate-50/80 dark:bg-slate-800/40
+                border-b border-slate-100 dark:border-slate-800">
+      <button id="prev-month"
+        class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-lg
+               bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+               text-slate-400 dark:text-slate-500 hover:text-primary-500 dark:hover:text-primary-400
+               hover:border-primary-300 dark:hover:border-primary-700
+               shadow-sm transition-all active:scale-95 flex-shrink-0">
+        ‹
+      </button>
+      <p id="month-label" class="flex-1 text-center text-slate-700 dark:text-slate-200 font-bold text-sm"></p>
+      <button id="next-month"
+        class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-lg
+               bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700
+               text-slate-400 dark:text-slate-500 hover:text-primary-500 dark:hover:text-primary-400
+               hover:border-primary-300 dark:hover:border-primary-700
+               shadow-sm transition-all active:scale-95 flex-shrink-0">
+        ›
+      </button>
+    </div>
+
+    <!-- Monthly Summary -->
+    <div class="px-4 py-4 border-b border-slate-100 dark:border-slate-800">
+      <p class="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mb-3">Ringkasan Bulan Ini</p>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="rounded-2xl p-3 text-center border
+                    bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/40">
+          <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-1.5">⬆ Masuk</p>
+          <p id="monthly-income" class="font-extrabold text-xs text-emerald-700 dark:text-emerald-300 leading-tight">Rp 0</p>
+        </div>
+        <div class="rounded-2xl p-3 text-center border
+                    bg-red-50 dark:bg-red-950/30 border-red-100 dark:border-red-900/40">
+          <p class="text-xs font-bold text-red-500 dark:text-red-400 mb-1.5">⬇ Keluar</p>
+          <p id="monthly-expense" class="font-extrabold text-xs text-red-600 dark:text-red-300 leading-tight">Rp 0</p>
+        </div>
+        <div class="rounded-2xl p-3 text-center border
+                    bg-primary-50 dark:bg-primary-950/30 border-primary-100 dark:border-primary-900/40">
+          <p class="text-xs font-bold text-primary-600 dark:text-primary-400 mb-1.5">💰 Saldo</p>
+          <p id="monthly-balance" class="font-extrabold text-xs text-primary-700 dark:text-primary-300 leading-tight">Rp 0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction List -->
+    <ul id="transaction-list" class="divide-y divide-slate-50 dark:divide-slate-800/60">
+      <!-- Skeleton loaders -->
+      <li class="px-5 py-4 flex items-center gap-3">
+        <span class="skeleton w-11 h-11 rounded-2xl inline-block flex-shrink-0"></span>
+        <div class="flex-1 space-y-2">
+          <span class="skeleton h-3.5 w-28 inline-block"></span>
+          <span class="skeleton h-3 w-20 inline-block"></span>
+        </div>
+        <span class="skeleton h-4 w-20 inline-block"></span>
+      </li>
+      <li class="px-5 py-4 flex items-center gap-3">
+        <span class="skeleton w-11 h-11 rounded-2xl inline-block flex-shrink-0"></span>
+        <div class="flex-1 space-y-2">
+          <span class="skeleton h-3.5 w-32 inline-block"></span>
+          <span class="skeleton h-3 w-24 inline-block"></span>
+        </div>
+        <span class="skeleton h-4 w-16 inline-block"></span>
+      </li>
+      <li class="px-5 py-4 flex items-center gap-3">
+        <span class="skeleton w-11 h-11 rounded-2xl inline-block flex-shrink-0"></span>
+        <div class="flex-1 space-y-2">
+          <span class="skeleton h-3.5 w-24 inline-block"></span>
+          <span class="skeleton h-3 w-16 inline-block"></span>
+        </div>
+        <span class="skeleton h-4 w-24 inline-block"></span>
+      </li>
+    </ul>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden text-center py-16 px-5">
+      <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-4">
+        <span class="text-3xl">🗓️</span>
+      </div>
+      <p class="text-slate-600 dark:text-slate-400 font-bold text-sm">Tidak ada transaksi</p>
+      <p class="text-slate-400 dark:text-slate-600 text-xs mt-1">Belum ada transaksi pada bulan ini.</p>
+    </div>
+  </section>
+</main>
+
+
+<!-- ================================================
+     TOAST
+================================================= -->
+<div id="toast"
+  class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 hidden
+         px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-bold
+         flex items-center gap-2.5 max-w-xs backdrop-blur-sm">
+</div>
+
+
+<!-- ================================================
+     DELETE MODAL
+================================================= -->
+<div id="modal-overlay"
+  class="hidden fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm z-40
+         flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6 max-w-sm w-full
+              dark:border dark:border-slate-700/60 fade-in-card">
+    <div class="text-center mb-5">
+      <div class="w-14 h-14 bg-red-50 dark:bg-red-950/40 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <span class="text-2xl">🗑️</span>
+      </div>
+      <h3 class="text-slate-900 dark:text-white font-extrabold text-base">Hapus Transaksi?</h3>
+      <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Tindakan ini tidak bisa dibatalkan.</p>
+    </div>
+    <div class="flex gap-3">
+      <button id="modal-cancel"
+        class="flex-1 py-3 border border-slate-200 dark:border-slate-700
+               text-slate-600 dark:text-slate-300 rounded-2xl text-sm font-bold
+               hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+        Batal
+      </button>
+      <button id="modal-confirm"
+        class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-sm font-bold
+               shadow-lg shadow-red-500/25 transition-all active:scale-[.98]">
+        Hapus
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/app.js"></script>
 </body>
 </html>

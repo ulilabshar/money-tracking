@@ -10,14 +10,32 @@ const SUPABASE_ANON_KEY = 'sb_publishable_Vnt6JGZrg86G1lANpo676A_bNw3OUyC';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// -- 2. APP STATE ---------------------------------------------
+// -- 2. THEME TOGGLE ------------------------------------------
+const html       = document.documentElement;
+const themeBtn   = document.getElementById('theme-toggle');
+
+function applyThemeIcon() {
+  themeBtn.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
+  themeBtn.title       = html.classList.contains('dark') ? 'Ganti ke Light Mode' : 'Ganti ke Dark Mode';
+}
+
+themeBtn.addEventListener('click', () => {
+  html.classList.toggle('dark');
+  localStorage.setItem('dk-theme', html.classList.contains('dark') ? 'dark' : 'light');
+  applyThemeIcon();
+});
+
+// Set initial icon
+applyThemeIcon();
+
+// -- 3. APP STATE ---------------------------------------------
 let currentUser     = null;
 let allTransactions = [];
 let selectedYear    = new Date().getFullYear();
-let selectedMonth   = new Date().getMonth() + 1; // 1-12
+let selectedMonth   = new Date().getMonth() + 1;
 let pendingDeleteId = null;
 
-// -- 3. DOM REFS ----------------------------------------------
+// -- 4. DOM REFS ----------------------------------------------
 const loginPage    = document.getElementById('login-page');
 const loginForm    = document.getElementById('login-form');
 const loginEmailEl = document.getElementById('login-email');
@@ -38,25 +56,27 @@ const monthlyIncEl = document.getElementById('monthly-income');
 const monthlyExpEl = document.getElementById('monthly-expense');
 const monthlyBalEl = document.getElementById('monthly-balance');
 
-const txList      = document.getElementById('transaction-list');
-const txCountEl   = document.getElementById('tx-count');
-const emptyState  = document.getElementById('empty-state');
-const form        = document.getElementById('transaction-form');
-const txTypeInput = document.getElementById('tx-type');
-const amountInput = document.getElementById('tx-amount');
+const txList        = document.getElementById('transaction-list');
+const txCountEl     = document.getElementById('tx-count');
+const emptyState    = document.getElementById('empty-state');
+const form          = document.getElementById('transaction-form');
+const txTypeInput   = document.getElementById('tx-type');
+const amountInput   = document.getElementById('tx-amount');
 const categoryInput = document.getElementById('tx-category');
-const dateInput   = document.getElementById('tx-date');
-const noteInput   = document.getElementById('tx-note');
-const submitBtn   = document.getElementById('submit-btn');
-const btnIncome   = document.getElementById('btn-income');
-const btnExpense  = document.getElementById('btn-expense');
-const toast       = document.getElementById('toast');
+const dateInput     = document.getElementById('tx-date');
+const noteInput     = document.getElementById('tx-note');
+const submitBtn     = document.getElementById('submit-btn');
+const btnIncome     = document.getElementById('btn-income');
+const btnExpense    = document.getElementById('btn-expense');
+const toast         = document.getElementById('toast');
 const modalOverlay  = document.getElementById('modal-overlay');
 const modalCancel   = document.getElementById('modal-cancel');
 const modalConfirm  = document.getElementById('modal-confirm');
 const pwaInstallBtn = document.getElementById('pwa-install-btn');
+const catExpenseGroup = document.getElementById('cat-expense');
+const catIncomeGroup  = document.getElementById('cat-income');
 
-// -- 4. UTILS -------------------------------------------------
+// -- 5. UTILS -------------------------------------------------
 const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni',
                    'Juli','Agustus','September','Oktober','November','Desember'];
 
@@ -75,20 +95,25 @@ function escapeHtml(str) {
 const catIcon = {
   'Makanan & Minuman':'🍜','Transportasi':'🚌','Belanja':'🛍️',
   'Kesehatan':'💊','Hiburan':'🎮','Tagihan':'📱','Pendidikan':'📚',
-  'Gaji':'💼','Freelance':'💻','Bisnis':'🏪','Investasi':'📈','Hadiah':'🎁','Lainnya':'✨'
+  'Gaji':'💼','Freelance':'💻','Bisnis':'🏪','Investasi':'📈',
+  'Hadiah':'🎁','Lainnya':'✨',
 };
 
 let toastTimer = null;
 function showToast(msg, type = 'success') {
-  const colors = { success:'bg-emerald-500', error:'bg-red-500', info:'bg-primary-500' };
-  const icons  = { success:'✅', error:'❌', info:'ℹ️' };
-  toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-semibold flex items-center gap-2 max-w-xs ${colors[type]||'bg-primary-500'}`;
-  toast.innerHTML = `<span>${icons[type]}</span><span>${msg}</span>`;
+  const cfg = {
+    success: { bg:'bg-emerald-500', icon:'✅' },
+    error:   { bg:'bg-red-500',     icon:'❌' },
+    info:    { bg:'bg-primary-500', icon:'ℹ️' },
+  };
+  const c = cfg[type] ?? cfg.info;
+  toast.className = `fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-xl text-white text-sm font-bold flex items-center gap-2.5 max-w-xs backdrop-blur-sm ${c.bg}`;
+  toast.innerHTML = `<span>${c.icon}</span><span>${escapeHtml(msg)}</span>`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-// -- 5. AUTH --------------------------------------------------
+// -- 6. AUTH --------------------------------------------------
 function showLogin() {
   loginPage.classList.remove('hidden');
   loginPage.style.display = '';
@@ -97,10 +122,9 @@ function showLogin() {
 function showApp(user) {
   loginPage.classList.add('hidden');
   loginPage.style.display = 'none';
-  userEmailEl.textContent = user.email;
+  userEmailEl.textContent  = user.email;
 }
 
-// Login submit
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   loginBtn.disabled    = true;
@@ -130,28 +154,24 @@ loginForm.addEventListener('submit', async (e) => {
       loginError.textContent = display;
       loginError.classList.remove('hidden');
     }
-    // success -> onAuthStateChange handles showing the app
   } catch (err) {
     console.error('Login exception:', err);
     loginError.textContent = 'Error: ' + (err.message ?? 'coba lagi.');
     loginError.classList.remove('hidden');
   } finally {
-    // Selalu reset button apapun yang terjadi
     loginBtn.disabled    = false;
     loginBtn.textContent = 'Masuk';
   }
 });
 
-// Logout
 logoutBtn.addEventListener('click', async () => {
   await supabase.auth.signOut();
   allTransactions = [];
-  balanceEl.innerHTML      = '<span class="skeleton h-8 w-36 rounded-lg inline-block"></span>';
-  totalIncomeEl.innerHTML  = '<span class="skeleton h-4 w-14 rounded inline-block"></span>';
-  totalExpenseEl.innerHTML = '<span class="skeleton h-4 w-20 rounded inline-block"></span>';
+  balanceEl.innerHTML      = '<span class="skeleton h-10 w-44 inline-block rounded-xl"></span>';
+  totalIncomeEl.innerHTML  = '<span class="skeleton h-4 w-20 inline-block"></span>';
+  totalExpenseEl.innerHTML = '<span class="skeleton h-4 w-20 inline-block"></span>';
 });
 
-// Auth state listener - single source of truth
 supabase.auth.onAuthStateChange(async (_event, session) => {
   if (session?.user) {
     currentUser = session.user;
@@ -164,44 +184,35 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
   }
 });
 
-// -- 6. TYPE TOGGLE -------------------------------------------
-const catExpenseGroup = document.getElementById('cat-expense');
-const catIncomeGroup  = document.getElementById('cat-income');
-
+// -- 7. TYPE TOGGLE -------------------------------------------
 function setType(type) {
   txTypeInput.value = type;
 
   if (type === 'income') {
-    // Toggle button styles
-    btnIncome.classList.add('bg-income','text-white','shadow-sm');
-    btnIncome.classList.remove('text-slate-500');
-    btnExpense.classList.remove('bg-expense','text-white','shadow-sm');
-    btnExpense.classList.add('text-slate-500');
-    // Show income categories, hide expense categories
+    btnIncome.classList.add('bg-emerald-500','text-white','shadow-sm','shadow-emerald-500/30');
+    btnIncome.classList.remove('text-slate-400','dark:text-slate-500');
+    btnExpense.classList.remove('bg-red-500','text-white','shadow-sm','shadow-red-500/30');
+    btnExpense.classList.add('text-slate-400','dark:text-slate-500');
     catIncomeGroup.hidden  = false;
     catExpenseGroup.hidden = true;
-    // Auto-select first income option
     categoryInput.value = catIncomeGroup.querySelector('option').value;
   } else {
-    // Toggle button styles
-    btnExpense.classList.add('bg-expense','text-white','shadow-sm');
-    btnExpense.classList.remove('text-slate-500');
-    btnIncome.classList.remove('bg-income','text-white','shadow-sm');
-    btnIncome.classList.add('text-slate-500');
-    // Show expense categories, hide income categories
+    btnExpense.classList.add('bg-red-500','text-white','shadow-sm','shadow-red-500/30');
+    btnExpense.classList.remove('text-slate-400','dark:text-slate-500');
+    btnIncome.classList.remove('bg-emerald-500','text-white','shadow-sm','shadow-emerald-500/30');
+    btnIncome.classList.add('text-slate-400','dark:text-slate-500');
     catExpenseGroup.hidden = false;
     catIncomeGroup.hidden  = true;
-    // Auto-select first expense option
     categoryInput.value = catExpenseGroup.querySelector('option').value;
   }
 }
+
 btnIncome.addEventListener('click', () => setType('income'));
 btnExpense.addEventListener('click', () => setType('expense'));
-// Set default state on load: income selected, expense categories hidden
 setType('income');
 dateInput.value = new Date().toISOString().split('T')[0];
 
-// -- 7. MONTH NAVIGATION --------------------------------------
+// -- 8. MONTH NAVIGATION --------------------------------------
 function updateMonthLabel() {
   monthLabelEl.textContent = `${MONTHS_ID[selectedMonth - 1]} ${selectedYear}`;
   renderFiltered();
@@ -212,14 +223,13 @@ prevMonthBtn.addEventListener('click', () => {
   if (selectedMonth < 1) { selectedMonth = 12; selectedYear--; }
   updateMonthLabel();
 });
-
 nextMonthBtn.addEventListener('click', () => {
   selectedMonth++;
   if (selectedMonth > 12) { selectedMonth = 1; selectedYear++; }
   updateMonthLabel();
 });
 
-// -- 8. LOAD ALL TRANSACTIONS ---------------------------------
+// -- 9. LOAD TRANSACTIONS -------------------------------------
 async function loadTransactions() {
   try {
     const { data, error } = await supabase
@@ -229,7 +239,6 @@ async function loadTransactions() {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-
     allTransactions = data || [];
     renderSummaryAll(allTransactions);
     renderFiltered();
@@ -241,18 +250,16 @@ async function loadTransactions() {
   }
 }
 
-// All-time summary (header cards)
 function renderSummaryAll(rows) {
   const inc = rows.filter(r => r.type === 'income').reduce((s, r) => s + +r.amount, 0);
   const exp = rows.filter(r => r.type === 'expense').reduce((s, r) => s + +r.amount, 0);
   const bal = inc - exp;
   balanceEl.textContent      = formatRupiah(bal);
-  balanceEl.className        = `text-3xl font-extrabold mt-1 tracking-tight ${bal < 0 ? 'text-red-200' : 'text-white'}`;
+  balanceEl.className        = `text-4xl font-black tracking-tight drop-shadow ${bal < 0 ? 'text-red-200' : 'text-white'}`;
   totalIncomeEl.textContent  = formatRupiah(inc);
   totalExpenseEl.textContent = formatRupiah(exp);
 }
 
-// Filter by selected month then render
 function renderFiltered() {
   const rows = allTransactions.filter(r => {
     const d = new Date(r.date + 'T00:00:00');
@@ -262,7 +269,6 @@ function renderFiltered() {
   renderList(rows);
 }
 
-// Monthly summary cards
 function renderMonthlySummary(rows) {
   const inc = rows.filter(r => r.type === 'income').reduce((s, r) => s + +r.amount, 0);
   const exp = rows.filter(r => r.type === 'expense').reduce((s, r) => s + +r.amount, 0);
@@ -270,10 +276,9 @@ function renderMonthlySummary(rows) {
   monthlyIncEl.textContent = formatRupiah(inc);
   monthlyExpEl.textContent = formatRupiah(exp);
   monthlyBalEl.textContent = formatRupiah(bal);
-  monthlyBalEl.className   = `font-extrabold text-xs leading-tight ${bal < 0 ? 'text-red-600' : 'text-primary-700'}`;
+  monthlyBalEl.className   = `font-extrabold text-xs leading-tight ${bal < 0 ? 'text-red-500 dark:text-red-400' : 'text-primary-700 dark:text-primary-300'}`;
 }
 
-// Render transaction list rows
 function renderList(rows) {
   txList.innerHTML = '';
 
@@ -289,25 +294,30 @@ function renderList(rows) {
   rows.forEach((tx, i) => {
     const isIncome = tx.type === 'income';
     const li = document.createElement('li');
-    li.className = 'px-5 py-3.5 flex items-center gap-3 hover:bg-slate-50 fade-in group';
-    li.style.animationDelay = `${i * 40}ms`;
+    li.className = 'px-5 py-4 flex items-center gap-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 fade-in group cursor-default';
+    li.style.animationDelay = `${i * 35}ms`;
     li.innerHTML = `
-      <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg ${isIncome ? 'bg-emerald-50' : 'bg-red-50'}">
+      <div class="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 text-xl
+                  ${isIncome ? 'bg-emerald-50 dark:bg-emerald-950/50' : 'bg-red-50 dark:bg-red-950/50'}">
         ${catIcon[tx.category] ?? '💸'}
       </div>
       <div class="flex-1 min-w-0">
-        <p class="text-slate-800 font-semibold text-sm truncate">${escapeHtml(tx.category)}</p>
-        <p class="text-slate-400 text-xs mt-0.5 flex items-center gap-1.5">
-          <span>${formatDate(tx.date)}</span>
-          ${tx.note ? `<span class="text-slate-300">·</span><span class="truncate max-w-[100px]">${escapeHtml(tx.note)}</span>` : ''}
-        </p>
+        <p class="text-slate-800 dark:text-slate-100 font-bold text-sm truncate">${escapeHtml(tx.category)}</p>
+        <div class="flex items-center gap-1.5 mt-0.5">
+          <span class="text-slate-400 dark:text-slate-500 text-xs">${formatDate(tx.date)}</span>
+          ${tx.note ? `<span class="text-slate-300 dark:text-slate-600 text-xs">·</span><span class="text-slate-400 dark:text-slate-500 text-xs truncate max-w-[90px]">${escapeHtml(tx.note)}</span>` : ''}
+        </div>
       </div>
       <div class="flex items-center gap-2 flex-shrink-0">
-        <span class="font-bold text-sm ${isIncome ? 'text-emerald-600' : 'text-red-500'}">
+        <span class="font-extrabold text-sm ${isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}">
           ${isIncome ? '+' : '-'}${formatRupiah(tx.amount)}
         </span>
         <button data-id="${tx.id}"
-          class="delete-btn opacity-0 group-hover:opacity-100 focus:opacity-100 w-7 h-7 rounded-lg bg-slate-100 hover:bg-red-100 text-slate-400 hover:text-red-500 flex items-center justify-center text-xs transition-all"
+          class="delete-btn opacity-0 group-hover:opacity-100 focus:opacity-100
+                 w-7 h-7 rounded-xl text-xs transition-all
+                 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500
+                 hover:bg-red-100 dark:hover:bg-red-950/50 hover:text-red-500 dark:hover:text-red-400
+                 flex items-center justify-center"
           title="Hapus">🗑</button>
       </div>`;
     txList.appendChild(li);
@@ -318,7 +328,7 @@ function renderList(rows) {
   );
 }
 
-// -- 9. ADD TRANSACTION ---------------------------------------
+// -- 10. ADD TRANSACTION --------------------------------------
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const amount   = parseFloat(amountInput.value);
@@ -328,7 +338,7 @@ form.addEventListener('submit', async (e) => {
   const note     = noteInput.value.trim();
 
   if (!amount || amount <= 0) { showToast('Nominal harus lebih dari 0', 'error'); amountInput.focus(); return; }
-  if (!date) { showToast('Pilih tanggal transaksi', 'error'); return; }
+  if (!date)                  { showToast('Pilih tanggal transaksi', 'error'); return; }
 
   submitBtn.disabled    = true;
   submitBtn.textContent = 'Menyimpan...';
@@ -339,8 +349,7 @@ form.addEventListener('submit', async (e) => {
     ]);
     if (error) throw error;
 
-    // Navigate to the month of the new transaction
-    const txDate = new Date(date + 'T00:00:00');
+    const txDate  = new Date(date + 'T00:00:00');
     selectedYear  = txDate.getFullYear();
     selectedMonth = txDate.getMonth() + 1;
 
@@ -359,7 +368,7 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// -- 10. DELETE TRANSACTION -----------------------------------
+// -- 11. DELETE TRANSACTION -----------------------------------
 function confirmDelete(id) {
   pendingDeleteId = id;
   modalOverlay.classList.remove('hidden');
@@ -384,7 +393,6 @@ modalConfirm.addEventListener('click', async () => {
     showToast('Transaksi dihapus', 'info');
     await loadTransactions();
   } catch (err) {
-    console.error('Delete error:', err);
     showToast('Gagal menghapus transaksi', 'error');
   } finally {
     pendingDeleteId = null;
@@ -392,7 +400,7 @@ modalConfirm.addEventListener('click', async () => {
   }
 });
 
-// -- 11. PWA --------------------------------------------------
+// -- 12. PWA --------------------------------------------------
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try { await navigator.serviceWorker.register('/sw.js'); }
@@ -414,7 +422,7 @@ pwaInstallBtn.addEventListener('click', async () => {
 });
 window.addEventListener('appinstalled', () => { pwaInstallBtn.classList.add('hidden'); deferredPrompt = null; });
 
-// -- 12. INIT: check session on load --------------------------
+// -- 13. INIT -------------------------------------------------
 (async () => {
   const { data: { session } } = await supabase.auth.getSession();
   if (session?.user) {
