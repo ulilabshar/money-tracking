@@ -1,6 +1,5 @@
 // ============================================================
 //  app.js - DompetKu PWA
-//  Stack: Vanilla JS + Supabase JS v2 (ESM CDN)
 // ============================================================
 
 const SUPABASE_URL      = 'https://opslmnkzfctqvolikhxy.supabase.co';
@@ -12,7 +11,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // ── THEME TOGGLE ─────────────────────────────────────────────
 const html     = document.documentElement;
 const themeBtn = document.getElementById('theme-toggle');
-
 function applyThemeIcon() {
   themeBtn.textContent = html.classList.contains('dark') ? '☀️' : '🌙';
   themeBtn.title       = html.classList.contains('dark') ? 'Ganti ke Light Mode' : 'Ganti ke Dark Mode';
@@ -64,13 +62,11 @@ const noteInput     = document.getElementById('tx-note');
 const submitBtn     = document.getElementById('submit-btn');
 const btnIncome     = document.getElementById('btn-income');
 const btnExpense    = document.getElementById('btn-expense');
-const catExpenseGroup = document.getElementById('cat-expense');
-const catIncomeGroup  = document.getElementById('cat-income');
 
-const toast        = document.getElementById('toast');
-const modalOverlay = document.getElementById('modal-overlay');
-const modalCancel  = document.getElementById('modal-cancel');
-const modalConfirm = document.getElementById('modal-confirm');
+const toast         = document.getElementById('toast');
+const modalOverlay  = document.getElementById('modal-overlay');
+const modalCancel   = document.getElementById('modal-cancel');
+const modalConfirm  = document.getElementById('modal-confirm');
 const pwaInstallBtn = document.getElementById('pwa-install-btn');
 
 // Edit modal refs
@@ -87,15 +83,46 @@ const editBtnExpense   = document.getElementById('edit-btn-expense');
 const editCancelBtn    = document.getElementById('edit-cancel-btn');
 const editModalClose   = document.getElementById('edit-modal-close');
 const editSaveBtn      = document.getElementById('edit-save-btn');
-const editCatExpense   = document.getElementById('edit-cat-expense');
-const editCatIncome    = document.getElementById('edit-cat-income');
+
+// ── CATEGORY DATA ─────────────────────────────────────────────
+const INCOME_CATS = [
+  { val:'Gaji',      label:'💼 Gaji' },
+  { val:'Freelance', label:'💻 Freelance' },
+  { val:'Bisnis',    label:'🏪 Bisnis' },
+  { val:'Investasi', label:'📈 Investasi' },
+  { val:'Hadiah',    label:'🎁 Hadiah' },
+  { val:'Lainnya',   label:'✨ Lainnya' },
+];
+const EXPENSE_CATS = [
+  { val:'Makanan & Minuman', label:'🍜 Makanan' },
+  { val:'Transportasi',      label:'🚌 Transportasi' },
+  { val:'Belanja',           label:'🛍️ Belanja' },
+  { val:'Kesehatan',         label:'💊 Kesehatan' },
+  { val:'Hiburan',           label:'🎮 Hiburan' },
+  { val:'Tagihan',           label:'📱 Tagihan' },
+  { val:'Pendidikan',        label:'📚 Pendidikan' },
+  { val:'Lainnya',           label:'✨ Lainnya' },
+];
+
+// Rebuild <select> options – works on all mobile browsers
+function buildOptions(selectEl, cats, selectedVal = null) {
+  selectEl.innerHTML = '';
+  cats.forEach(({ val, label }) => {
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = label;
+    if (selectedVal && selectedVal === val) opt.selected = true;
+    selectEl.appendChild(opt);
+  });
+}
 
 // ── UTILS ─────────────────────────────────────────────────────
 const MONTHS_ID = ['Januari','Februari','Maret','April','Mei','Juni',
                    'Juli','Agustus','September','Oktober','November','Desember'];
 
-const formatRupiah = (n) =>
-  new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', maximumFractionDigits:2 }).format(n);
+// Numbers only — no "Rp" prefix
+const formatNumber = (n) =>
+  new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(n);
 
 const formatDate = (s) =>
   new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
@@ -196,53 +223,52 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
   }
 });
 
-// ── ADD TRANSACTION TYPE TOGGLE ───────────────────────────────
+// ── TYPE TOGGLE (Add Form) ────────────────────────────────────
 function setType(type) {
   txTypeInput.value = type;
+  const cats = type === 'income' ? INCOME_CATS : EXPENSE_CATS;
+  buildOptions(categoryInput, cats); // rebuild options for this type
   if (type === 'income') {
     btnIncome.classList.add('bg-emerald-500','text-white','shadow-sm');
     btnIncome.classList.remove('text-slate-400','dark:text-zinc-500');
     btnExpense.classList.remove('bg-red-500','text-white','shadow-sm');
     btnExpense.classList.add('text-slate-400','dark:text-zinc-500');
-    catIncomeGroup.hidden  = false;
-    catExpenseGroup.hidden = true;
-    categoryInput.value = catIncomeGroup.querySelector('option').value;
   } else {
     btnExpense.classList.add('bg-red-500','text-white','shadow-sm');
     btnExpense.classList.remove('text-slate-400','dark:text-zinc-500');
     btnIncome.classList.remove('bg-emerald-500','text-white','shadow-sm');
     btnIncome.classList.add('text-slate-400','dark:text-zinc-500');
-    catExpenseGroup.hidden = false;
-    catIncomeGroup.hidden  = true;
-    categoryInput.value = catExpenseGroup.querySelector('option').value;
   }
 }
 btnIncome.addEventListener('click', () => setType('income'));
 btnExpense.addEventListener('click', () => setType('expense'));
-setType('income');
+setType('income'); // default
 dateInput.value = new Date().toISOString().split('T')[0];
 
-// ── EDIT TRANSACTION TYPE TOGGLE ──────────────────────────────
-function setEditType(type) {
+// ── TYPE TOGGLE (Edit Modal) ──────────────────────────────────
+function setEditType(type, selectedCat = null) {
   editTxType.value = type;
+  const cats = type === 'income' ? INCOME_CATS : EXPENSE_CATS;
+  buildOptions(editTxCategory, cats, selectedCat); // rebuild & select
   if (type === 'income') {
     editBtnIncome.classList.add('bg-emerald-500','text-white','shadow-sm');
     editBtnIncome.classList.remove('text-slate-400','dark:text-zinc-500');
     editBtnExpense.classList.remove('bg-red-500','text-white','shadow-sm');
     editBtnExpense.classList.add('text-slate-400','dark:text-zinc-500');
-    editCatIncome.hidden  = false;
-    editCatExpense.hidden = true;
   } else {
     editBtnExpense.classList.add('bg-red-500','text-white','shadow-sm');
     editBtnExpense.classList.remove('text-slate-400','dark:text-zinc-500');
     editBtnIncome.classList.remove('bg-emerald-500','text-white','shadow-sm');
     editBtnIncome.classList.add('text-slate-400','dark:text-zinc-500');
-    editCatExpense.hidden = false;
-    editCatIncome.hidden  = true;
   }
 }
-editBtnIncome.addEventListener('click', () => setEditType('income'));
-editBtnExpense.addEventListener('click', () => setEditType('expense'));
+// When toggling type in edit modal, keep current category if it exists in new list
+editBtnIncome.addEventListener('click', () => {
+  setEditType('income');
+});
+editBtnExpense.addEventListener('click', () => {
+  setEditType('expense');
+});
 
 function openEditModal(id) {
   const tx = allTransactions.find(t => t.id === id);
@@ -251,16 +277,13 @@ function openEditModal(id) {
   editTxAmount.value = tx.amount;
   editTxDate.value   = tx.date;
   editTxNote.value   = tx.note ?? '';
-  setEditType(tx.type);
-  // Set category value after optgroup visibility is updated
-  setTimeout(() => { editTxCategory.value = tx.category; }, 0);
+  setEditType(tx.type, tx.category); // pass category to pre-select correctly
   editModalOverlay.classList.remove('hidden');
 }
 
 function closeEditModal() {
   editModalOverlay.classList.add('hidden');
 }
-
 editCancelBtn.addEventListener('click', closeEditModal);
 editModalClose.addEventListener('click', closeEditModal);
 editModalOverlay.addEventListener('click', (e) => {
@@ -281,7 +304,6 @@ editForm.addEventListener('submit', async (e) => {
 
   editSaveBtn.disabled    = true;
   editSaveBtn.textContent = 'Menyimpan...';
-
   try {
     const { error } = await supabase
       .from('transactions')
@@ -298,7 +320,6 @@ editForm.addEventListener('submit', async (e) => {
     await loadTransactions();
     updateMonthLabel();
   } catch (err) {
-    console.error('Edit error:', err);
     showToast('Gagal menyimpan: ' + (err.message ?? ''), 'error');
   } finally {
     editSaveBtn.disabled    = false;
@@ -335,7 +356,6 @@ async function loadTransactions() {
     renderSummaryAll(allTransactions);
     renderFiltered();
   } catch (err) {
-    console.error('Load error:', err);
     showToast('Gagal memuat data.', 'error');
     txList.innerHTML = '';
     emptyState.classList.remove('hidden');
@@ -346,10 +366,10 @@ function renderSummaryAll(rows) {
   const inc = rows.filter(r => r.type === 'income').reduce((s, r) => s + +r.amount, 0);
   const exp = rows.filter(r => r.type === 'expense').reduce((s, r) => s + +r.amount, 0);
   const bal = inc - exp;
-  balanceEl.textContent      = formatRupiah(bal);
+  balanceEl.textContent      = formatNumber(bal);
   balanceEl.className        = `text-4xl font-black tracking-tight ${bal < 0 ? 'text-red-500 dark:text-red-400' : 'text-slate-900 dark:text-white'}`;
-  totalIncomeEl.textContent  = formatRupiah(inc);
-  totalExpenseEl.textContent = formatRupiah(exp);
+  totalIncomeEl.textContent  = formatNumber(inc);
+  totalExpenseEl.textContent = formatNumber(exp);
 }
 
 function renderFiltered() {
@@ -365,26 +385,23 @@ function renderMonthlySummary(rows) {
   const inc = rows.filter(r => r.type === 'income').reduce((s, r) => s + +r.amount, 0);
   const exp = rows.filter(r => r.type === 'expense').reduce((s, r) => s + +r.amount, 0);
   const bal = inc - exp;
-  monthlyIncEl.textContent = formatRupiah(inc);
-  monthlyExpEl.textContent = formatRupiah(exp);
-  monthlyBalEl.textContent = formatRupiah(bal);
+  monthlyIncEl.textContent = formatNumber(inc);
+  monthlyExpEl.textContent = formatNumber(exp);
+  monthlyBalEl.textContent = formatNumber(bal);
   monthlyBalEl.className   = `font-extrabold text-xs leading-tight ${bal < 0 ? 'text-red-500 dark:text-red-400' : 'text-primary-700 dark:text-primary-300'}`;
 }
 
-// ── RENDER LIST (with daily grouping) ─────────────────────────
+// ── RENDER LIST (daily grouping) ──────────────────────────────
 function renderList(rows) {
   txList.innerHTML = '';
-
   if (!rows || rows.length === 0) {
     emptyState.classList.remove('hidden');
     txCountEl.textContent = '0 transaksi';
     return;
   }
-
   emptyState.classList.add('hidden');
   txCountEl.textContent = `${rows.length} transaksi`;
 
-  // Group by date (rows already sorted newest first)
   const groups = {};
   const dateOrder = [];
   rows.forEach(tx => {
@@ -398,25 +415,22 @@ function renderList(rows) {
     const dayExp  = dayRows.filter(r => r.type === 'expense').reduce((s, r) => s + +r.amount, 0);
     const dayBal  = dayInc - dayExp;
 
-    // ── Date Header ──────────────────────────
+    // Date header
     const header = document.createElement('li');
     header.className = 'px-4 py-2.5 flex items-center justify-between sticky top-0 z-10 ' +
                        'bg-slate-50 dark:bg-zinc-900 ' +
                        'border-t border-slate-100 dark:border-zinc-800 first:border-t-0';
     header.innerHTML = `
-      <p class="text-slate-500 dark:text-zinc-400 font-bold text-xs capitalize tracking-wide">
-        ${escapeHtml(formatDateHeader(date))}
-      </p>
+      <p class="text-slate-500 dark:text-zinc-400 font-bold text-xs capitalize">${escapeHtml(formatDateHeader(date))}</p>
       <div class="flex items-center gap-2">
-        ${dayInc > 0 ? `<span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">+${formatRupiah(dayInc)}</span>` : ''}
-        ${dayExp > 0 ? `<span class="text-xs font-bold text-red-500 dark:text-red-400">−${formatRupiah(dayExp)}</span>` : ''}
+        ${dayInc > 0 ? `<span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">+${formatNumber(dayInc)}</span>` : ''}
+        ${dayExp > 0 ? `<span class="text-xs font-bold text-red-500 dark:text-red-400">−${formatNumber(dayExp)}</span>` : ''}
         <span class="text-xs font-extrabold ${dayBal >= 0 ? 'text-slate-400 dark:text-zinc-500' : 'text-red-400 dark:text-red-500'}">
-          = ${formatRupiah(dayBal)}
+          = ${formatNumber(dayBal)}
         </span>
       </div>`;
     txList.appendChild(header);
 
-    // ── Transaction Items for this date ──────
     dayRows.forEach((tx, i) => {
       const isIncome = tx.type === 'income';
       const li = document.createElement('li');
@@ -429,34 +443,29 @@ function renderList(rows) {
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-slate-800 dark:text-zinc-100 font-bold text-sm truncate">${escapeHtml(tx.category)}</p>
-          ${tx.note
-            ? `<p class="text-slate-400 dark:text-zinc-500 text-xs mt-0.5 truncate max-w-[160px]">${escapeHtml(tx.note)}</p>`
-            : ''}
+          ${tx.note ? `<p class="text-slate-400 dark:text-zinc-500 text-xs mt-0.5 truncate">${escapeHtml(tx.note)}</p>` : ''}
         </div>
         <div class="flex items-center gap-1.5 flex-shrink-0">
           <span class="font-extrabold text-sm ${isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}">
-            ${isIncome ? '+' : '−'}${formatRupiah(tx.amount)}
+            ${isIncome ? '+' : '−'}${formatNumber(tx.amount)}
           </span>
           <button data-id="${tx.id}"
             class="edit-btn opacity-0 group-hover:opacity-100 focus:opacity-100
                    w-7 h-7 rounded-xl text-xs transition-all
                    bg-slate-100 dark:bg-zinc-900 text-slate-400 dark:text-zinc-500
-                   hover:bg-primary-100 dark:hover:bg-primary-950/50 hover:text-primary-500 dark:hover:text-primary-400
-                   flex items-center justify-center"
-            title="Edit">✏️</button>
+                   hover:bg-primary-100 dark:hover:bg-primary-950/50 hover:text-primary-500
+                   flex items-center justify-center" title="Edit">✏️</button>
           <button data-id="${tx.id}"
             class="delete-btn opacity-0 group-hover:opacity-100 focus:opacity-100
                    w-7 h-7 rounded-xl text-xs transition-all
                    bg-slate-100 dark:bg-zinc-900 text-slate-400 dark:text-zinc-500
-                   hover:bg-red-100 dark:hover:bg-red-950/50 hover:text-red-500 dark:hover:text-red-400
-                   flex items-center justify-center"
-            title="Hapus">🗑</button>
+                   hover:bg-red-100 dark:hover:bg-red-950/50 hover:text-red-500
+                   flex items-center justify-center" title="Hapus">🗑</button>
         </div>`;
       txList.appendChild(li);
     });
   });
 
-  // Bind buttons
   txList.querySelectorAll('.edit-btn').forEach(btn =>
     btn.addEventListener('click', () => openEditModal(btn.dataset.id))
   );
@@ -503,15 +512,9 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
-// ── DELETE TRANSACTION ────────────────────────────────────────
-function confirmDelete(id) {
-  pendingDeleteId = id;
-  modalOverlay.classList.remove('hidden');
-}
-modalCancel.addEventListener('click', () => {
-  pendingDeleteId = null;
-  modalOverlay.classList.add('hidden');
-});
+// ── DELETE ────────────────────────────────────────────────────
+function confirmDelete(id) { pendingDeleteId = id; modalOverlay.classList.remove('hidden'); }
+modalCancel.addEventListener('click', () => { pendingDeleteId = null; modalOverlay.classList.add('hidden'); });
 modalOverlay.addEventListener('click', (e) => {
   if (e.target === modalOverlay) { pendingDeleteId = null; modalOverlay.classList.add('hidden'); }
 });
@@ -524,25 +527,19 @@ modalConfirm.addEventListener('click', async () => {
     if (error) throw error;
     showToast('Transaksi dihapus', 'info');
     await loadTransactions();
-  } catch (err) {
-    showToast('Gagal menghapus transaksi', 'error');
-  } finally {
-    pendingDeleteId       = null;
-    modalConfirm.disabled = false;
-  }
+  } catch { showToast('Gagal menghapus', 'error'); }
+  finally { pendingDeleteId = null; modalConfirm.disabled = false; }
 });
 
 // ── PWA ───────────────────────────────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
-    try { await navigator.serviceWorker.register('/sw.js'); }
-    catch (err) { console.warn('[SW] Failed:', err); }
+    try { await navigator.serviceWorker.register('/sw.js'); } catch {}
   });
 }
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); deferredPrompt = e;
-  pwaInstallBtn.classList.remove('hidden');
+  e.preventDefault(); deferredPrompt = e; pwaInstallBtn.classList.remove('hidden');
 });
 pwaInstallBtn.addEventListener('click', async () => {
   if (!deferredPrompt) return;
