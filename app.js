@@ -203,6 +203,13 @@ loginForm.addEventListener('submit', async (e) => {
   }
 });
 
+// Demo account auto-fill & login
+document.getElementById('demo-login-btn').addEventListener('click', () => {
+  loginEmailEl.value = 'admin@test.com';
+  loginPassEl.value  = '12345678';
+  loginForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+});
+
 logoutBtn.addEventListener('click', async () => {
   await supabase.auth.signOut();
   allTransactions = [];
