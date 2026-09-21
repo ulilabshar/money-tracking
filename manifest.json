@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "DompetKu - Pencatat Keuangan",
   "short_name": "DompetKu",
   "description": "Aplikasi pencatat pemasukan dan pengeluaran pribadi yang modern dan simpel.",
@@ -11,11 +11,12 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/logo.jpg",
+      "src": "/logo.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
   "categories": ["finance", "productivity"]
 }
+
