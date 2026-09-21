@@ -12,7 +12,7 @@
   <meta name="description" content="Pencatat pemasukan dan pengeluaran pribadi yang modern." />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/logo.png" />
-  <link rel="icon" type="image/jpeg" href="/logo.png" />
+  <link rel="icon" type="image/png" href="/logo.png" />
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -105,15 +105,14 @@
                 border border-slate-100 dark:border-zinc-800">
       <!-- Logo -->
       <div class="text-center mb-8">
-        <img src="/logo.png" alt="DompetKu"
-          class="w-20 h-20 rounded-3xl mx-auto mb-4 shadow-lg object-cover" />
+        <img src="/logo.png" alt="DompetKu" class="w-20 h-20 mx-auto mb-4 object-contain drop-shadow-md" />
         <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">DompetKu</h1>
         <p class="text-slate-400 dark:text-zinc-500 text-sm mt-1">Masuk untuk melanjutkan</p>
       </div>
       <!-- Form -->
       <form id="login-form" class="space-y-3" novalidate>
         <div class="relative">
-          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">âœ‰ï¸</span>
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">✉️</span>
           <input type="email" id="login-email" placeholder="Email" required autocomplete="email"
             class="w-full pl-10 pr-4 py-3.5 rounded-2xl text-sm font-medium
                    bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
@@ -121,7 +120,7 @@
                    focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
         </div>
         <div class="relative">
-          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">ðŸ”’</span>
+          <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-base pointer-events-none">🔒</span>
           <input type="password" id="login-password" placeholder="Password" required autocomplete="current-password"
             class="w-full pl-10 pr-4 py-3.5 rounded-2xl text-sm font-medium
                    bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
@@ -151,11 +150,11 @@
                  bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700
                  text-slate-600 dark:text-zinc-300
                  hover:bg-slate-50 dark:hover:bg-zinc-700 transition-all active:scale-[.98]">
-          Isi Otomatis & Masuk â†’
+          Isi Otomatis & Masuk →
         </button>
       </div>
 
-      <p class="text-center text-slate-400 dark:text-zinc-600 text-xs mt-4">Keuangan pribadi Anda ðŸ”</p>
+      <p class="text-center text-slate-400 dark:text-zinc-600 text-xs mt-4">Keuangan pribadi Anda 🔐</p>
     </div>
   </div>
 </div>
@@ -169,8 +168,7 @@
     <!-- Top bar -->
     <div class="flex items-center justify-between mb-1">
       <div class="flex items-center gap-2.5">
-        <img src="/logo.png" alt="DompetKu"
-          class="w-9 h-9 rounded-xl object-cover border border-slate-200 dark:border-zinc-800" />
+        <img src="/logo.png" alt="DompetKu" class="w-9 h-9 object-contain" />
         <span class="font-bold text-lg tracking-tight text-slate-900 dark:text-white">DompetKu</span>
       </div>
       <div class="flex items-center gap-1.5">
@@ -179,20 +177,20 @@
           class="w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
                  rounded-xl flex items-center justify-center text-base transition-all active:scale-95 no-select"
           title="Ganti tema">
-          ðŸŒ™
+          🌙
         </button>
         <!-- Install PWA -->
         <button id="pwa-install-btn"
           class="hidden w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
                  rounded-xl flex items-center justify-center text-base transition-all">
-          ðŸ“²
+          📲
         </button>
         <!-- Logout -->
         <button id="logout-btn"
           class="text-xs font-semibold bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800
                  text-slate-600 dark:text-zinc-300 px-3 py-2 rounded-xl
                  border border-slate-200 dark:border-zinc-800 transition-all active:scale-95">
-          Keluar â†’
+          Keluar →
         </button>
       </div>
     </div>
@@ -210,7 +208,7 @@
     <div class="grid grid-cols-2 gap-3">
       <div class="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/40">
         <div class="flex items-center gap-2 mb-2">
-          <div class="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center text-xs">â¬†</div>
+          <div class="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center text-xs">⬆</div>
           <p class="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">Pemasukan</p>
         </div>
         <p id="total-income" class="text-emerald-700 dark:text-emerald-300 font-bold text-sm leading-tight">
@@ -219,7 +217,7 @@
       </div>
       <div class="bg-red-50 dark:bg-red-950/30 rounded-2xl p-4 border border-red-100 dark:border-red-900/40">
         <div class="flex items-center gap-2 mb-2">
-          <div class="w-6 h-6 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center text-xs">â¬‡</div>
+          <div class="w-6 h-6 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center text-xs">⬇</div>
           <p class="text-red-500 dark:text-red-400 text-xs font-semibold">Pengeluaran</p>
         </div>
         <p id="total-expense" class="text-red-600 dark:text-red-300 font-bold text-sm leading-tight">
@@ -236,7 +234,7 @@
 ================================================= -->
 <main class="max-w-lg mx-auto px-4 -mt-12 pb-28 space-y-4">
 
-  <!-- â”€â”€ Add Transaction â”€â”€ -->
+  <!-- ── Add Transaction ── -->
   <section class="bg-white dark:bg-zinc-950 rounded-3xl shadow-card dark:shadow-card-dark
                   border border-slate-100 dark:border-zinc-800 p-5">
     <h2 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -250,12 +248,12 @@
         <button type="button" id="btn-income"
           class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all no-select
                  bg-emerald-500 text-white shadow-sm shadow-emerald-500/30">
-          â¬† Pemasukan
+          ⬆ Pemasukan
         </button>
         <button type="button" id="btn-expense"
           class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all no-select
                  text-slate-400 dark:text-slate-500">
-          â¬‡ Pengeluaran
+          ⬇ Pengeluaran
         </button>
       </div>
       <input type="hidden" id="tx-type" value="income" />
@@ -281,7 +279,7 @@
                      text-slate-700 dark:text-slate-200
                      focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent">
             </select>
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none text-xs">â–¾</span>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 pointer-events-none text-xs">▾</span>
           </div>
         </div>
         <div>
@@ -312,14 +310,14 @@
   </section>
 
 
-  <!-- â”€â”€ Transaction History â”€â”€ -->
+  <!-- ── Transaction History ── -->
   <section class="bg-white dark:bg-zinc-950 rounded-3xl shadow-card dark:shadow-card-dark
                   border border-slate-100 dark:border-zinc-800 overflow-hidden">
 
     <!-- Section Header -->
     <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
       <h2 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
-        <span class="w-5 h-5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg flex items-center justify-center text-xs">ðŸ“‹</span>
+        <span class="w-5 h-5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-lg flex items-center justify-center text-xs">📋</span>
         Riwayat
       </h2>
       <span id="tx-count"
@@ -340,7 +338,7 @@
                text-slate-400 dark:text-slate-500 hover:text-primary-500 dark:hover:text-primary-400
                hover:border-primary-300 dark:hover:border-primary-700
                shadow-sm transition-all active:scale-95 flex-shrink-0">
-        â€¹
+        ‹
       </button>
       <p id="month-label" class="flex-1 text-center text-slate-700 dark:text-slate-200 font-bold text-sm"></p>
       <button id="next-month"
@@ -349,7 +347,7 @@
                text-slate-400 dark:text-slate-500 hover:text-primary-500 dark:hover:text-primary-400
                hover:border-primary-300 dark:hover:border-primary-700
                shadow-sm transition-all active:scale-95 flex-shrink-0">
-        â€º
+        ›
       </button>
     </div>
 
@@ -359,17 +357,17 @@
       <div class="grid grid-cols-3 gap-2">
         <div class="rounded-2xl p-3 text-center border
                     bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/40">
-          <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-1.5">â¬† Masuk</p>
+          <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-1.5">⬆ Masuk</p>
           <p id="monthly-income" class="font-extrabold text-xs text-emerald-700 dark:text-emerald-300 leading-tight">Rp 0</p>
         </div>
         <div class="rounded-2xl p-3 text-center border
                     bg-red-50 dark:bg-red-950/30 border-red-100 dark:border-red-900/40">
-          <p class="text-xs font-bold text-red-500 dark:text-red-400 mb-1.5">â¬‡ Keluar</p>
+          <p class="text-xs font-bold text-red-500 dark:text-red-400 mb-1.5">⬇ Keluar</p>
           <p id="monthly-expense" class="font-extrabold text-xs text-red-600 dark:text-red-300 leading-tight">Rp 0</p>
         </div>
         <div class="rounded-2xl p-3 text-center border
                     bg-primary-50 dark:bg-primary-950/30 border-primary-100 dark:border-primary-900/40">
-          <p class="text-xs font-bold text-primary-600 dark:text-primary-400 mb-1.5">ðŸ’° Saldo</p>
+          <p class="text-xs font-bold text-primary-600 dark:text-primary-400 mb-1.5">💰 Saldo</p>
           <p id="monthly-balance" class="font-extrabold text-xs text-primary-700 dark:text-primary-300 leading-tight">Rp 0</p>
         </div>
       </div>
@@ -407,7 +405,7 @@
     <!-- Empty State -->
     <div id="empty-state" class="hidden text-center py-16 px-5">
       <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-4">
-        <span class="text-3xl">ðŸ—“ï¸</span>
+        <span class="text-3xl">🗓️</span>
       </div>
       <p class="text-slate-600 dark:text-slate-400 font-bold text-sm">Tidak ada transaksi</p>
       <p class="text-slate-400 dark:text-slate-600 text-xs mt-1">Belum ada transaksi pada bulan ini.</p>
@@ -436,7 +434,7 @@
               dark:border dark:border-zinc-800 fade-in-card">
     <div class="text-center mb-5">
       <div class="w-14 h-14 bg-red-50 dark:bg-red-950/40 rounded-2xl flex items-center justify-center mx-auto mb-3">
-        <span class="text-2xl">ðŸ—‘ï¸</span>
+        <span class="text-2xl">🗑️</span>
       </div>
       <h3 class="text-slate-900 dark:text-white font-extrabold text-base">Hapus Transaksi?</h3>
       <p class="text-slate-400 dark:text-slate-500 text-sm mt-1">Tindakan ini tidak bisa dibatalkan.</p>
@@ -468,13 +466,13 @@
     <!-- Header -->
     <div class="flex items-center justify-between mb-5">
       <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 bg-primary-50 dark:bg-primary-950/50 rounded-xl flex items-center justify-center text-sm">âœï¸</div>
+        <div class="w-8 h-8 bg-primary-50 dark:bg-primary-950/50 rounded-xl flex items-center justify-center text-sm">✏️</div>
         <h3 class="text-slate-900 dark:text-white font-extrabold text-base">Edit Transaksi</h3>
       </div>
       <button id="edit-modal-close"
         class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-zinc-900 text-slate-400 dark:text-zinc-500
                flex items-center justify-center text-sm hover:bg-slate-200 dark:hover:bg-zinc-800 transition-all">
-        âœ•
+        ✕
       </button>
     </div>
 
@@ -487,12 +485,12 @@
         <button type="button" id="edit-btn-income"
           class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all no-select
                  bg-emerald-500 text-white shadow-sm">
-          â¬† Pemasukan
+          ⬆ Pemasukan
         </button>
         <button type="button" id="edit-btn-expense"
           class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all no-select
                  text-slate-400 dark:text-zinc-500">
-          â¬‡ Pengeluaran
+          ⬇ Pengeluaran
         </button>
       </div>
 
@@ -517,7 +515,7 @@
                      text-slate-700 dark:text-zinc-200
                      focus:outline-none focus:ring-2 focus:ring-primary-500">
             </select>
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500 pointer-events-none text-xs">â–¾</span>
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500 pointer-events-none text-xs">▾</span>
           </div>
         </div>
         <div>
