@@ -249,7 +249,7 @@ function setType(type) {
 }
 btnIncome.addEventListener('click', () => setType('income'));
 btnExpense.addEventListener('click', () => setType('expense'));
-setType('income'); // default
+setType('expense'); // default
 dateInput.value = new Date().toISOString().split('T')[0];
 
 // ── TYPE TOGGLE (Edit Modal) ──────────────────────────────────
