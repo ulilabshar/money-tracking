@@ -161,82 +161,73 @@
 
 
 <!-- ================================================
-     HEADER
+     CONTENT
 ================================================= -->
-<header class="bg-white dark:bg-black">
-  <div class="max-w-lg mx-auto px-4 pt-10 pb-20">
-    <!-- Top bar -->
-    <div class="flex items-center justify-between mb-1">
-      <div class="flex items-center gap-2.5">
-        <img src="/logo.png" alt="DompetKu" class="w-9 h-9 object-contain" />
-        <span class="font-bold text-lg tracking-tight text-slate-900 dark:text-white">DompetKu</span>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <!-- Theme toggle -->
-        <button id="theme-toggle"
-          class="w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
-                 rounded-xl flex items-center justify-center text-base transition-all active:scale-95 no-select"
-          title="Ganti tema">
-          🌙
-        </button>
-        <!-- Install PWA -->
-        <button id="pwa-install-btn"
-          class="hidden w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
-                 rounded-xl flex items-center justify-center text-base transition-all">
-          📲
-        </button>
-        <!-- Logout -->
-        <button id="logout-btn"
-          class="text-xs font-semibold bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800
-                 text-slate-600 dark:text-zinc-300 px-3 py-2 rounded-xl
-                 border border-slate-200 dark:border-zinc-800 transition-all active:scale-95">
-          Keluar →
-        </button>
-      </div>
-    </div>
-    <p id="user-email" class="text-slate-400 dark:text-zinc-600 text-xs mb-6 truncate"></p>
+<main class="max-w-lg mx-auto px-4 pt-10 pb-28 space-y-5">
 
-    <!-- Balance Card -->
-    <div class="bg-slate-50 dark:bg-zinc-950 rounded-3xl p-5 mb-3">
-      <p class="text-slate-400 dark:text-zinc-500 text-xs font-semibold uppercase tracking-widest mb-2">Saldo Keseluruhan</p>
-      <p id="balance-amount" class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-        <span class="skeleton h-10 w-44 inline-block rounded-xl"></span>
-      </p>
+  <!-- ── Top bar ── -->
+  <div class="flex items-center justify-between mb-1">
+    <div class="flex items-center gap-2.5">
+      <img src="/logo.png" alt="DompetKu" class="w-9 h-9 object-contain" />
+      <span class="font-bold text-lg tracking-tight text-slate-900 dark:text-white">DompetKu</span>
     </div>
-
-    <!-- Income / Expense Mini Cards -->
-    <div class="grid grid-cols-2 gap-3">
-      <div class="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/40">
-        <div class="flex items-center gap-2 mb-2">
-          <div class="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center text-xs">⬆</div>
-          <p class="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">Pemasukan</p>
-        </div>
-        <p id="total-income" class="text-emerald-700 dark:text-emerald-300 font-bold text-sm leading-tight">
-          <span class="skeleton h-4 w-20 inline-block"></span>
-        </p>
-      </div>
-      <div class="bg-red-50 dark:bg-red-950/30 rounded-2xl p-4 border border-red-100 dark:border-red-900/40">
-        <div class="flex items-center gap-2 mb-2">
-          <div class="w-6 h-6 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center text-xs">⬇</div>
-          <p class="text-red-500 dark:text-red-400 text-xs font-semibold">Pengeluaran</p>
-        </div>
-        <p id="total-expense" class="text-red-600 dark:text-red-300 font-bold text-sm leading-tight">
-          <span class="skeleton h-4 w-20 inline-block"></span>
-        </p>
-      </div>
+    <div class="flex items-center gap-1.5">
+      <!-- Theme toggle -->
+      <button id="theme-toggle"
+        class="w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
+               rounded-xl flex items-center justify-center text-base transition-all active:scale-95 no-select"
+        title="Ganti tema">
+        🌙
+      </button>
+      <!-- Install PWA -->
+      <button id="pwa-install-btn"
+        class="hidden w-9 h-9 bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800
+               rounded-xl flex items-center justify-center text-base transition-all">
+        📲
+      </button>
+      <!-- Logout -->
+      <button id="logout-btn"
+        class="text-xs font-semibold bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800
+               text-slate-600 dark:text-zinc-300 px-3 py-2 rounded-xl
+               border border-slate-200 dark:border-zinc-800 transition-all active:scale-95">
+        Keluar →
+      </button>
     </div>
   </div>
-</header>
+  <p id="user-email" class="text-slate-400 dark:text-zinc-600 text-xs -mt-3 truncate"></p>
 
+  <!-- ── Balance Card ── -->
+  <div class="bg-slate-50 dark:bg-zinc-950 rounded-3xl p-5">
+    <p class="text-slate-400 dark:text-zinc-500 text-xs font-semibold uppercase tracking-widest mb-2">Saldo Keseluruhan</p>
+    <p id="balance-amount" class="text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+      <span class="skeleton h-10 w-44 inline-block rounded-xl"></span>
+    </p>
+  </div>
 
-<!-- ================================================
-     MAIN
-================================================= -->
-<main class="max-w-lg mx-auto px-4 -mt-12 pb-28 space-y-4">
+  <!-- ── Income / Expense Mini Cards ── -->
+  <div class="grid grid-cols-2 gap-3">
+    <div class="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-4 border border-emerald-100 dark:border-emerald-900/40">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/50 rounded-lg flex items-center justify-center text-xs">⬆</div>
+        <p class="text-emerald-600 dark:text-emerald-400 text-xs font-semibold">Pemasukan</p>
+      </div>
+      <p id="total-income" class="text-emerald-700 dark:text-emerald-300 font-bold text-sm leading-tight">
+        <span class="skeleton h-4 w-20 inline-block"></span>
+      </p>
+    </div>
+    <div class="bg-red-50 dark:bg-red-950/30 rounded-2xl p-4 border border-red-100 dark:border-red-900/40">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-6 h-6 bg-red-100 dark:bg-red-900/50 rounded-lg flex items-center justify-center text-xs">⬇</div>
+        <p class="text-red-500 dark:text-red-400 text-xs font-semibold">Pengeluaran</p>
+      </div>
+      <p id="total-expense" class="text-red-600 dark:text-red-300 font-bold text-sm leading-tight">
+        <span class="skeleton h-4 w-20 inline-block"></span>
+      </p>
+    </div>
+  </div>
 
   <!-- ── Add Transaction ── -->
-  <section class="bg-white dark:bg-zinc-950 rounded-3xl shadow-card dark:shadow-card-dark
-                  border border-slate-100 dark:border-zinc-800 p-5">
+  <section class="p-5 rounded-3xl bg-slate-50 dark:bg-zinc-950">
     <h2 class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
       <span class="w-5 h-5 bg-primary-100 dark:bg-primary-900/50 text-primary-500 rounded-lg flex items-center justify-center text-xs font-black">+</span>
       Tambah Transaksi
@@ -311,8 +302,7 @@
 
 
   <!-- ── Transaction History ── -->
-  <section class="bg-white dark:bg-zinc-950 rounded-3xl shadow-card dark:shadow-card-dark
-                  border border-slate-100 dark:border-zinc-800 overflow-hidden">
+  <section class="rounded-3xl bg-slate-50 dark:bg-zinc-950 overflow-hidden">
 
     <!-- Section Header -->
     <div class="flex items-center justify-between px-5 py-4">
