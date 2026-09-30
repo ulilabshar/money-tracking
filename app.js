@@ -507,7 +507,7 @@ form.addEventListener('submit', async (e) => {
 
     showToast('Transaksi berhasil disimpan! 🎉', 'success');
     form.reset();
-    setType('income');
+    setType('expense');
     dateInput.value = new Date().toISOString().split('T')[0];
     await loadTransactions();
     updateMonthLabel();
