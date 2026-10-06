@@ -391,7 +391,19 @@ function renderFiltered() {
 function renderMonthlySummary(rows) {
   const inc = rows.filter(r => r.type === 'income').reduce((s, r) => s + +r.amount, 0);
   const exp = rows.filter(r => r.type === 'expense').reduce((s, r) => s + +r.amount, 0);
-  const bal = inc - exp;
+
+  // Hitung sisa saldo dari bulan-bulan sebelumnya
+  const prevRows = allTransactions.filter(r => {
+    const d = new Date(r.date + 'T00:00:00');
+    const y = d.getFullYear(), m = d.getMonth() + 1;
+    return y < selectedYear || (y === selectedYear && m < selectedMonth);
+  });
+  const prevInc  = prevRows.filter(r => r.type === 'income').reduce((s, r) => s + +r.amount, 0);
+  const prevExp  = prevRows.filter(r => r.type === 'expense').reduce((s, r) => s + +r.amount, 0);
+  const carryover = prevInc - prevExp;
+
+  const bal = carryover + inc - exp;
+
   monthlyIncEl.textContent = formatNumber(inc);
   monthlyExpEl.textContent = formatNumber(exp);
   monthlyBalEl.textContent = formatNumber(bal);
