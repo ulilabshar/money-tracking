@@ -1,10 +1,11 @@
 /* sw.js - DompetKu Service Worker */
-const CACHE_NAME = 'dompetku-v1';
+const CACHE_NAME = 'dompetku-v2'; // bump version to invalidate old caches
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/app.js',
-  '/manifest.json'
+  '/manifest.json',
+  '/logo.png',  // added: logo must be available offline
 ];
 
 // Install: cache static assets
@@ -31,14 +32,15 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Skip Supabase API calls (always network)
+  // Skip Supabase API calls and non-GET requests (always network)
   if (url.hostname.includes('supabase.co')) return;
+  if (event.request.method !== 'GET') return;
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
         // Cache a copy of successful GET responses
-        if (event.request.method === 'GET' && response.ok) {
+        if (response.ok) {
           const cloned = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cloned));
         }

@@ -136,10 +136,11 @@ const formatDateHeader = (s) => {
   return d.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 };
 
+// Cache element for reuse — avoids creating a new DOM node each call
+const _escDiv = document.createElement('div');
 function escapeHtml(str) {
-  const d = document.createElement('div');
-  d.appendChild(document.createTextNode(String(str)));
-  return d.innerHTML;
+  _escDiv.textContent = String(str);
+  return _escDiv.innerHTML;
 }
 
 const catIcon = {
@@ -218,7 +219,9 @@ logoutBtn.addEventListener('click', async () => {
   totalExpenseEl.innerHTML = '<span class="skeleton h-4 w-20 inline-block"></span>';
 });
 
-supabase.auth.onAuthStateChange(async (_event, session) => {
+supabase.auth.onAuthStateChange(async (event, session) => {
+  // INITIAL_SESSION is handled by the IIFE below — skip to avoid double load
+  if (event === 'INITIAL_SESSION') return;
   if (session?.user) {
     currentUser = session.user;
     showApp(currentUser);
@@ -299,6 +302,8 @@ editModalOverlay.addEventListener('click', (e) => {
 
 editForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!currentUser) { showToast('Sesi berakhir, silakan login ulang', 'error'); return; }
+
   const id       = editTxId.value;
   const amount   = parseFloat(editTxAmount.value);
   const type     = editTxType.value;
@@ -306,8 +311,8 @@ editForm.addEventListener('submit', async (e) => {
   const date     = editTxDate.value;
   const note     = editTxNote.value.trim();
 
-  if (!amount || amount <= 0) { showToast('Nominal harus lebih dari 0', 'error'); editTxAmount.focus(); return; }
-  if (!date)                  { showToast('Pilih tanggal transaksi', 'error'); return; }
+  if (isNaN(amount) || amount <= 0) { showToast('Nominal harus lebih dari 0', 'error'); editTxAmount.focus(); return; }
+  if (!date)                        { showToast('Pilih tanggal transaksi', 'error'); return; }
 
   editSaveBtn.disabled    = true;
   editSaveBtn.textContent = 'Menyimpan...';
@@ -315,7 +320,8 @@ editForm.addEventListener('submit', async (e) => {
     const { error } = await supabase
       .from('transactions')
       .update({ type, amount, category, date, note: note || null })
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', currentUser.id); // defense-in-depth: only update own records
     if (error) throw error;
 
     const txDate  = new Date(date + 'T00:00:00');
@@ -428,6 +434,7 @@ function renderList(rows) {
     groups[tx.date].push(tx);
   });
 
+  let rowIndex = 0; // global counter for consistent animation stagger
   dateOrder.forEach(date => {
     const dayRows = groups[date];
     const dayInc  = dayRows.filter(r => r.type === 'income').reduce((s, r) => s + +r.amount, 0);
@@ -450,11 +457,11 @@ function renderList(rows) {
       </div>`;
     txList.appendChild(header);
 
-    dayRows.forEach((tx, i) => {
+    dayRows.forEach((tx) => {
       const isIncome = tx.type === 'income';
       const li = document.createElement('li');
       li.className = 'px-5 py-3.5 flex items-center gap-3.5 hover:bg-slate-50 dark:hover:bg-zinc-900/50 fade-in group cursor-default';
-      li.style.animationDelay = `${i * 30}ms`;
+      li.style.animationDelay = `${Math.min(rowIndex++, 10) * 30}ms`; // cap at 10 for UX
       li.innerHTML = `
         <div class="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 text-lg
                     ${isIncome ? 'bg-emerald-50 dark:bg-emerald-950/50' : 'bg-red-50 dark:bg-red-950/50'}">
@@ -496,14 +503,16 @@ function renderList(rows) {
 // ── ADD TRANSACTION ───────────────────────────────────────────
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (!currentUser) { showToast('Sesi berakhir, silakan login ulang', 'error'); return; }
+
   const amount   = parseFloat(amountInput.value);
   const type     = txTypeInput.value;
   const category = categoryInput.value;
   const date     = dateInput.value;
   const note     = noteInput.value.trim();
 
-  if (!amount || amount <= 0) { showToast('Nominal harus lebih dari 0', 'error'); amountInput.focus(); return; }
-  if (!date)                  { showToast('Pilih tanggal transaksi', 'error'); return; }
+  if (isNaN(amount) || amount <= 0) { showToast('Nominal harus lebih dari 0', 'error'); amountInput.focus(); return; }
+  if (!date)                        { showToast('Pilih tanggal transaksi', 'error'); return; }
 
   submitBtn.disabled    = true;
   submitBtn.textContent = 'Menyimpan...';
@@ -542,7 +551,11 @@ modalConfirm.addEventListener('click', async () => {
   modalOverlay.classList.add('hidden');
   modalConfirm.disabled = true;
   try {
-    const { error } = await supabase.from('transactions').delete().eq('id', pendingDeleteId);
+    const { error } = await supabase
+      .from('transactions')
+      .delete()
+      .eq('id', pendingDeleteId)
+      .eq('user_id', currentUser?.id); // defense-in-depth: only delete own records
     if (error) throw error;
     showToast('Transaksi dihapus', 'info');
     await loadTransactions();
@@ -570,14 +583,20 @@ pwaInstallBtn.addEventListener('click', async () => {
 window.addEventListener('appinstalled', () => { pwaInstallBtn.classList.add('hidden'); deferredPrompt = null; });
 
 // ── INIT ──────────────────────────────────────────────────────
+// Handles INITIAL_SESSION — onAuthStateChange above handles subsequent events
 (async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    showApp(currentUser);
-    updateMonthLabel();
-    await loadTransactions();
-  } else {
-    showLogin();
+  try {
+    const { data } = await supabase.auth.getSession();
+    const session  = data?.session;
+    if (session?.user) {
+      currentUser = session.user;
+      showApp(currentUser);
+      updateMonthLabel();
+      await loadTransactions();
+    } else {
+      showLogin();
+    }
+  } catch {
+    showLogin(); // fallback to login page on any init error
   }
 })();
